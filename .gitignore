@@ -1,0 +1,6 @@
+.DS_Store
+.idea
+out
+gen
+node_modules/
+fonts/
