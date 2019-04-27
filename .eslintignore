@@ -1,0 +1,6 @@
+node_modules/
+lib/**/*.min.js
+*.md
+*.woff
+*.ttf
+*.d.ts

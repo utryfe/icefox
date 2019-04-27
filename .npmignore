@@ -1,5 +1,6 @@
 .DS_Store
 node_modules
+build
 
 # Log files
 npm-debug.log*
@@ -14,10 +15,15 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw*
-
 .project
+
 test/unit/coverage
 /.gitignore
 /.prettierrc
 /.npmignore
 /.editorconfig
+/.eslintignore
+/.eslintrc.js
+/babel.config.js
+/.browserslistrc
+/vue.config.js

@@ -1,3 +1,3 @@
 ## Vue app framework
 
-An vue app framework used.
+A library for vue app.

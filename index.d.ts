@@ -12,7 +12,6 @@ interface DebugInstance {
 declare module 'vue/types/vue' {
   interface Vue {
     readonly $http: AxiosInstance
-
     readonly $debug: DebugInstance
   }
 }
