@@ -1,6 +1,6 @@
-import { AxiosInstance } from 'axios'
+import { AxiosStatic } from 'axios'
 
-interface DebugInstance {
+interface DebugStatic {
   (...args: any[]): void
   debug(...args: any[]): void
   log(...args: any[]): void
@@ -9,9 +9,12 @@ interface DebugInstance {
   error(...args: any[]): void
 }
 
-declare module 'vue/types/vue' {
-  interface Vue {
-    readonly $http: AxiosInstance
-    readonly $debug: DebugInstance
+declare module 'vue' {
+  export interface Vue {
+    readonly $http: AxiosStatic
+    readonly $debug: DebugStatic
+  }
+  export interface VueConstructor {
+    $http: AxiosStatic
   }
 }
