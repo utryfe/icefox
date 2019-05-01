@@ -9,12 +9,13 @@ interface DebugStatic {
   error(...args: any[]): void
 }
 
-declare module 'vue/types/vue' {
-  export interface Vue {
+declare module 'vue' {
+  interface Vue {
     readonly $http: AxiosStatic
     readonly $debug: DebugStatic
   }
-  export interface VueConstructor {
+
+  interface VueConstructor {
     $http: AxiosStatic
   }
 }
