@@ -1,15 +1,19 @@
 {
   "name": "icefox",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A library for vue app.",
-  "main": "index.js",
+  "main": "lib/index.js",
   "dependencies": {
+    "animate.css": "^3.7.0",
     "axios": "^0.18.0",
     "debug": "^4.1.1",
+    "lodash.debounce": "^4.0.8",
     "qs": "^6.7.0",
-    "url-parse": "^1.4.7"
+    "url-parse": "^1.4.7",
+    "vue-resize-directive": "^1.2.0"
   },
   "devDependencies": {
+    "@vue/cli-plugin-eslint": "^3.7.0",
     "@vue/eslint-config-prettier": "^4.0.1",
     "babel-eslint": "^10.0.1",
     "eslint": "^5.16.0",
