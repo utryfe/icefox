@@ -56,13 +56,16 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@import '../../theme/var.less';
 .splitter-pane {
   &-item {
     margin: 0;
     padding: 0;
     border: none;
-    transition: width 0.2s ease-out, min-width 0.2s ease-out, height 0.2s ease-out,
-      min-height 0.2s ease-out;
+    transition: width @layout-pane-transition-duration ease-out,
+      min-width @layout-pane-transition-duration ease-out,
+      height @layout-pane-transition-duration ease-out,
+      min-height @layout-pane-transition-duration ease-out;
   }
 
   &-left,

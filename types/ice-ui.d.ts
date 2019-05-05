@@ -4,6 +4,7 @@ import { IceComponent } from './component'
 // components
 import { IceBasicLayout } from './components/basic-layout'
 import { IceSplitPanes } from './components/split-panes'
+import { IceAsideMenu, IceMenu } from './components/aside-menu'
 
 // exports
 export interface InstallationOptions {}
@@ -17,3 +18,7 @@ export class BasicLayout extends IceBasicLayout {}
 
 // split-panes
 export class SplitPanes extends IceSplitPanes {}
+
+// aside-menu
+export class AsideMenu extends IceAsideMenu {}
+export { IceMenu }

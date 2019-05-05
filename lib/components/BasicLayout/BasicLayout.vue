@@ -25,23 +25,23 @@
         </transition>
 
         <div class="platform-wrapper" @click="handleHomeClick">
-          <transition
-            enter-active-class="animated fadeInLeft"
-            leave-active-class="animated fadeOutLeft"
-          >
-            <div class="platform-logo">
-              <slot name="logo" />
-            </div>
-          </transition>
+          <div class="platform-logo">
+            <slot name="logo" />
+          </div>
 
-          <transition
-            enter-active-class="animated fadeInLeft"
-            leave-active-class="animated fadeOutLeft"
-          >
-            <div v-if="!asideCollapsed" class="platform-name">
-              <slot name="platform" />
-            </div>
-          </transition>
+          <template v-if="collapseTransition">
+            <transition
+              enter-active-class="animated fadeInLeftLittle"
+              leave-active-class="animated fadeOutLeftLittle"
+            >
+              <div v-if="!asideCollapsed" class="platform-name">
+                <slot name="platform" />
+              </div>
+            </transition>
+          </template>
+          <div v-else class="platform-name">
+            <slot name="platform" />
+          </div>
         </div>
       </div>
 
@@ -100,6 +100,14 @@ export default {
      * 是否强制设置面板宽高样式
      */
     forceSizing: Boolean,
+
+    /**
+     * 是否启用折叠动画
+     */
+    collapseTransition: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   data() {
@@ -112,12 +120,13 @@ export default {
 
   computed: {
     className() {
-      const { collapsible, asideCollapsed } = this
+      const { collapsible, asideCollapsed, collapseTransition } = this
       return [
         'basic-layout',
         {
           'layout-collapsible': collapsible,
           'layout-collapsed': asideCollapsed,
+          'layout-collapse-transition-none': !collapseTransition,
         },
       ]
     },
@@ -141,7 +150,7 @@ export default {
           min: '240px',
           max: '400px',
           default: '240px',
-          collapsed: '80px',
+          collapsed: '60px',
         },
         argType === 'string' || argType === 'number' ? { default: asideSize } : asideSize
       )
@@ -185,8 +194,6 @@ body {
   margin: 0;
   padding: 0;
   border: 0;
-  /*width: 100%;*/
-  /*height: 100%;*/
 }
 
 body {
@@ -197,6 +204,7 @@ body {
   font-size: 14px;
   line-height: 1.5;
   font-variant: tabular-nums;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .basic-layout {
@@ -212,6 +220,25 @@ body {
     .platform-wrapper > .platform-logo {
       & > img {
         max-height: 61.8%;
+      }
+    }
+  }
+
+  &.layout-collapse-transition-none {
+    & > .splitter-pane-left {
+      transition: none;
+      .aside-panel {
+        .menu-wrapper {
+          & > .ice-aside-menu {
+            transition: none;
+
+            /* & > .el-menu-item,
+            & > .el-menu-item-group > ul > .el-menu-item,
+            & > .el-submenu > .el-submenu__title {
+              transition: none;
+            }*/
+          }
+        }
       }
     }
   }
@@ -267,7 +294,36 @@ body {
             transition: left 0.3s ease, transform 0.3s ease-in-out;
             position: absolute;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate3d(-50%, 0, 0);
+          }
+        }
+      }
+    }
+  }
+
+  &.layout-collapse-transition-none {
+    transition: none;
+
+    .aside-panel {
+      & > .header-wrapper {
+        .platform-wrapper {
+          .platform-logo {
+            transition: none;
+          }
+        }
+      }
+    }
+
+    &.layout-collapsed {
+      .aside-panel {
+        & > .header-wrapper {
+          .platform-wrapper {
+            .platform-logo {
+              transition: none;
+            }
+            .platform-name {
+              display: none;
+            }
           }
         }
       }
@@ -276,16 +332,19 @@ body {
 }
 
 .aside-panel {
-  box-shadow: 2px 0 6px rgba(0, 21, 41, 0.35);
+  box-shadow: 2px 0 6px @layout-aside-box-shadow-color;
   z-index: 1;
 
   .header-wrapper {
     position: absolute;
-    background-color: @layout-aside-header-background;
+    background-color: @layout-aside-header-background-color;
+    box-shadow: 1px 1px 0 0 @layout-aside-header-border-color;
     height: @layout-header-height;
+    box-sizing: border-box;
     width: 100%;
     left: 0;
     top: 0;
+    z-index: 1;
 
     .trigger {
       font-size: 16px;
@@ -298,7 +357,7 @@ body {
       text-align: center;
       top: 0;
       right: 0;
-      transform: translateX(100%);
+      transform: translate3d(100%, 0, 0);
       cursor: pointer;
       animation-duration: 0.3s;
       transition: background-color 0.3s, color 0.1s;
@@ -327,12 +386,12 @@ body {
         display: flex;
         flex: none;
         align-items: center;
-        transform: translateX(0);
+        transform: translate3d(0, 0, 0);
         transition: left 0.3s ease-out;
       }
 
       .platform-name {
-        animation-duration: 0.32s;
+        animation-duration: 0.5s;
         overflow: hidden;
         white-space: nowrap;
         word-break: keep-all;
@@ -343,7 +402,7 @@ body {
 
   .menu-wrapper {
     height: 100%;
-    background-color: @layout-aside-background;
+    background-color: @layout-aside-background-color;
   }
 }
 
@@ -363,9 +422,41 @@ body {
     align-items: center;
     justify-content: flex-end;
     flex-wrap: nowrap;
-    background: @layout-header-background;
-    box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+    background: @layout-header-background-color;
+    box-shadow: 0 1px 4px @layout-header-box-shadow-color;
     transition: padding-left 0.3s ease-out;
+  }
+}
+
+.fadeInLeftLittle {
+  animation-name: fadeInLeftLittle;
+}
+
+.fadeOutLeftLittle {
+  animation-name: fadeOutLeftLittle;
+}
+
+@keyframes fadeInLeftLittle {
+  from {
+    opacity: 0;
+    transform: translate3d(-24px, 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeOutLeftLittle {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(-24px, 0, 0);
   }
 }
 </style>

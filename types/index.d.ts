@@ -1,6 +1,8 @@
 import Vue from 'vue'
+import VueRouter from 'vue-router'
+import { Store } from 'vuex'
 import { AxiosStatic } from 'axios'
-import * as IceUI from './ice-ui'
+import * as IceFox from './ice-ui'
 export * from './ice-ui'
 
 interface DebugStatic {
@@ -14,14 +16,17 @@ interface DebugStatic {
 
 declare module 'vue/types/vue' {
   interface Vue {
-    readonly $http: AxiosStatic
-    readonly $debug: DebugStatic
-    readonly $ICEFOX: IceUI.InstallationOptions
+    readonly $http?: AxiosStatic
+    readonly $debug?: DebugStatic
+    readonly $appTitle?: String
+    readonly $ICEFOX?: IceFox.InstallationOptions
   }
   interface VueConstructor {
-    readonly $http: AxiosStatic
-    readonly $debug: DebugStatic
+    readonly $router?: VueRouter
+    readonly $store?: Store<object>
+    readonly $http?: AxiosStatic
+    readonly $debug?: DebugStatic
   }
 }
 
-export default IceUI
+export default IceFox

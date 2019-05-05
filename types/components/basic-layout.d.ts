@@ -14,7 +14,9 @@ export declare class IceBasicLayout extends IceComponent {
 
   collapsed?: boolean
 
-  asideSize?: AsideSize | string | number
+  asideSize?: string | number | AsideSize
 
   forceSizing?: boolean
+
+  collapseTransition?: boolean
 }
