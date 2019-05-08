@@ -1,6 +1,20 @@
+import { VNode } from 'vue'
 import { IceComponent } from '../component'
 
 export declare class IceSplitPanes extends IceComponent {
+  $slots: {
+    left: VNode[]
+    right: VNode[]
+    top: VNode[]
+    bottom: VNode[]
+    default: VNode[]
+  }
+
+  /**
+   * 分割区域时，是否将flex容器交换位置
+   */
+  reversed?: boolean
+
   /**
    * 使用水平分割
    */

@@ -1,54 +1,182 @@
 <template>
   <element-menu
-    :class="className"
-    v-on="$listeners"
-    v-bind="$attrs"
-    :collapse="collapse"
+    ref="menu"
+    :class="menuClassName"
+    :router="router"
+    :collapse="menuCollapsed"
     :popper-class="popperClassName"
     :collapse-transition="false"
+    :unique-opened="uniqueOpened"
+    :default-active="currentActive"
     mode="vertical"
+    v-bind="$attrs"
+    v-on="$listeners"
   >
     <slot />
   </element-menu>
 </template>
 
 <script>
-import ElementMenu from './ElementMenu'
+import ElementMenu from '../Menu/ElementMenu'
+import { mergeClass } from '../../utils/vnode'
+import { isSameRoute } from '../../utils/route'
 
 export default {
   name: 'IceAsideMenu',
   inheritAttrs: false,
   components: { ElementMenu },
   props: {
-    getSubMenuProps: Function,
+    /**
+     * 是否开启路由模式
+     */
+    router: Boolean,
+
+    /**
+     * 是否已折叠（.sync）
+     */
     collapse: Boolean,
-    popperClass: String,
+
+    /**
+     * 菜单折叠时弹出层的样式
+     */
+    popperClass: [String, Array, Object],
+
+    /**
+     * 默认激活的菜单项index（ID）
+     */
+    defaultActive: [String, Number],
+
+    /**
+     * 是否应用折叠动效
+     */
     collapseTransition: {
       type: Boolean,
       default: true,
     },
+
+    /**
+     * 单一展开模式
+     */
+    uniqueOpened: {
+      type: Boolean,
+      default: true,
+    },
   },
+
+  inject: ['$basicLayout'],
+
+  data() {
+    return {
+      menuCollapsed: !!this.collapse,
+    }
+  },
+
   computed: {
-    className() {
-      const { collapse, collapseTransition } = this
+    menuClassName() {
+      const { menuCollapsed, collapseTransition } = this
       return [
         'ice-aside-menu',
         {
-          'aside-collapsed': collapse,
-          'ice-collapse-transition-none': !collapseTransition,
+          'ice-collapsed': menuCollapsed,
+          'ice-transition-none': !collapseTransition,
         },
       ]
     },
+
     popperClassName() {
       const { popperClass, collapseTransition } = this
-      const className = ['ice-aside-menu-popper']
-      if (popperClass && typeof popperClass === 'string') {
-        className.push(popperClass)
+      return mergeClass(popperClass, 'ice-aside-menu-popper', {
+        'ice-transition-none': !collapseTransition,
+      })
+    },
+
+    currentActive() {
+      const { defaultActive, router, $route } = this
+      let activeIndex
+      if (router && $route !== null && typeof $route === 'object') {
+        activeIndex = this.getActiveIndexByRoute($route)
       }
-      if (!collapseTransition) {
-        className.push('ice-collapse-transition-none')
+      if (!activeIndex) {
+        activeIndex = defaultActive
       }
-      return className.join(' ')
+
+      if (['string', 'number'].includes(typeof activeIndex)) {
+        return `${activeIndex}`
+      }
+      return ''
+    },
+  },
+
+  watch: {
+    collapse(collapsed) {
+      this.menuCollapsed = !!collapsed
+    },
+
+    menuCollapsed(collapsed) {
+      this.$emit('update:collapse', collapsed)
+      const { $basicLayout } = this
+      if ($basicLayout) {
+        $basicLayout.$emit('aside-state-change', { collapsed })
+      }
+    },
+  },
+
+  created() {
+    const { $basicLayout } = this
+    if ($basicLayout) {
+      $basicLayout.$on('aside-state-change', this.updateCollapse)
+    }
+  },
+
+  beforeDestroy() {
+    const { $basicLayout } = this
+    if ($basicLayout) {
+      $basicLayout.$off('aside-state-change', this.updateCollapse)
+    }
+  },
+
+  methods: {
+    updateCollapse(state) {
+      const { collapsed } = Object.assign({}, state)
+      if (typeof collapsed === 'boolean') {
+        this.menuCollapsed = collapsed
+      }
+    },
+
+    getActiveIndexByRoute({ path }) {
+      const { menu } = this.$refs
+      if (!menu) {
+        return ''
+      }
+
+      const menuItemsStore = menu.getMenuItemsStore()
+      if (!menuItemsStore) {
+        return ''
+      }
+
+      const routeTypes = ['string', 'object']
+      for (const [index, { route }] of Object.entries(menuItemsStore)) {
+        let type
+        let routePath
+        if (route && routeTypes.includes((type = typeof route))) {
+          if (type === 'string') {
+            routePath = route
+          } else if (typeof route.path === 'string') {
+            routePath = route.path
+          }
+        }
+        if (!routePath) {
+          routePath = index
+        }
+        if (!routePath.startsWith('/')) {
+          routePath = `/${routePath}`
+        }
+        if (isSameRoute(routePath, path)) {
+          return index
+        }
+      }
+
+      return ''
     },
   },
 }
@@ -82,11 +210,15 @@ export default {
     opacity: 1;
     transition: opacity 0.4s ease-in-out;
   }
+
+  .el-menu-item {
+    cursor: pointer;
+  }
 }
 
 .ice-aside-menu.el-menu,
 .ice-aside-menu-popper {
-  &.ice-collapse-transition-none {
+  &.ice-transition-none {
     transition: none;
     animation: none;
     .el-menu--inline {
@@ -97,7 +229,7 @@ export default {
 }
 
 .ice-aside-menu.el-menu {
-  .ice-menu-item {
+  .el-menu-item {
     &:after {
       content: '';
       position: absolute;
@@ -119,15 +251,22 @@ export default {
   }
 }
 
-.ice-aside-menu.el-menu.aside-collapsed,
+.ice-aside-menu.el-menu.ice-collapsed,
 .ice-aside-menu-popper .el-menu {
-  .ice-menu-item {
+  .el-menu-item {
     &,
     &.is-active {
       &:after {
         display: none;
       }
     }
+  }
+}
+
+.ice-aside-menu-popper {
+  .el-menu--popup-right-start {
+    margin-left: @aside-menu-popper-margin;
+    margin-right: @aside-menu-popper-margin;
   }
 }
 
@@ -153,7 +292,7 @@ export default {
   }
 }
 
-.ice-aside-menu.el-menu.aside-collapsed {
+.ice-aside-menu.el-menu.ice-collapsed {
   & > .el-menu-item,
   & > .el-menu-item-group > ul > .el-menu-item {
     &.is-active {
@@ -163,7 +302,7 @@ export default {
   }
 }
 
-.ice-aside-menu.el-menu.aside-collapsed > .el-submenu,
+.ice-aside-menu.el-menu.ice-collapsed > .el-submenu,
 .ice-aside-menu-popper .el-menu .el-submenu {
   &.is-opened,
   &.is-active {
@@ -242,13 +381,12 @@ export default {
     padding-right: 50px;
   }
 
-  & > .el-menu-item,
-  .el-submenu > .el-menu-item,
+  .el-menu-item,
   .el-menu-item-group > .el-menu-item-group__title {
     padding-right: 20px;
   }
 
-  &.aside-collapsed {
+  &.ice-collapsed {
     width: 100%;
 
     & > .el-menu-item-group > .el-menu-item-group__title {
@@ -260,23 +398,24 @@ export default {
     }
 
     & > .el-menu-item,
+    & > .el-menu-item > .el-tooltip,
     & > .el-menu-item-group > ul > .el-menu-item,
     & > .el-submenu > .el-submenu__title {
       padding: 0 !important;
       text-align: center;
 
-      & > .ice-menu-icon,
-      & > [class^='el-icon-'] {
-        margin: 0;
-      }
-
       & > .ice-menu-item-title {
         opacity: 0;
       }
-    }
 
-    & > .el-submenu > .el-menu--inline {
-      display: none;
+      & > .el-submenu > .el-menu--inline {
+        display: none;
+      }
+
+      .ice-menu-icon,
+      [class^='el-icon-'] {
+        margin: 0;
+      }
     }
   }
 }

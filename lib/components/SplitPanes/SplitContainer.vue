@@ -3,26 +3,39 @@
     :class="className"
     @mouseup="onMouseUp"
     @mousemove="onMouseMove"
-    v-resize="updateSizes"
+    v-resize.debounce.60="updateSizes"
   >
     <split-pane
-      ref="one"
-      :style="paneOneStyles"
+      :ref="reversed ? 'two' : 'one'"
+      :style="reversed ? null : paneOneStyles"
       :position="positionOne"
+      :reversed="reversed"
       :force-sizing="forceSizing"
+      @size-change="changeSizes"
+      @resizable-change="changeResizable"
     >
       <slot :name="positionOne" />
     </split-pane>
 
     <split-handle
+      v-show="!preventResize"
       :horizontal="horizontal"
       :show-line="showSplitLine"
+      :as-layout="asLayout"
       :use-default-cursor="!resizable"
       @mousedown.native.stop.prevent="onMouseDown"
       @dblclick.native.stop.prevent="onDblClick"
     />
 
-    <split-pane ref="two" :position="positionTwo" :force-sizing="forceSizing">
+    <split-pane
+      :ref="reversed ? 'one' : 'two'"
+      :style="reversed ? paneOneStyles : null"
+      :position="positionTwo"
+      :reversed="reversed"
+      :force-sizing="forceSizing"
+      @size-change="changeSizes"
+      @resizable-change="changeResizable"
+    >
       <slot :name="positionTwo" />
     </split-pane>
   </div>
@@ -33,6 +46,16 @@ import debounce from 'lodash.debounce'
 import resize from 'vue-resize-directive'
 import SplitPane from './SplitPane'
 import SplitHandle from './SplitHandle'
+import {
+  addAnimationEndListener,
+  addAnimationStartListener,
+  addTransitionEndListener,
+  addTransitionStartListener,
+  removeAnimationEndListener,
+  removeAnimationStartListener,
+  removeTransitionEndListener,
+  removeTransitionStartListener,
+} from '../../utils/dom'
 
 export default {
   name: 'IceSplitPanes',
@@ -69,7 +92,7 @@ export default {
      */
     minSize: {
       type: [String, Number],
-      default: '20%',
+      default: '',
     },
 
     /**
@@ -108,26 +131,43 @@ export default {
      * 是否强制同步设置内容元素大小
      */
     forceSizing: Boolean,
+
+    /**
+     * 反转flex部分
+     */
+    reversed: Boolean,
   },
 
   data() {
+    const { minSize, maxSize, initialSize } = this
     return {
+      limitSize: {
+        min: minSize === '' ? initialSize : minSize,
+        max: maxSize,
+      },
+      asLayout: false,
+      $updateSizeTimer: 0,
+      $changeSizeTimer: 0,
       dragging: false,
       hasMoved: false,
+      useTransition: true,
+      preventResize: false,
       sizes: [[0, 0], [0, 0]],
-      currentSize: this.initialSize,
+      currentSize: initialSize,
       handler: this.doResize,
     }
   },
+
+  inject: ['$basicLayout'],
 
   computed: {
     className() {
       const { horizontal, dragging } = this
       return [
-        'split-panes',
-        'splitter-container-item',
-        `splitter-container-${horizontal ? 'horizontal' : 'vertical'}`,
-        { 'splitter-dragging': dragging },
+        'ice-split-panes',
+        'ice-splitter-container-item',
+        `ice-splitter-container-${horizontal ? 'horizontal' : 'vertical'}`,
+        { 'ice-dragging': dragging },
       ]
     },
 
@@ -136,17 +176,23 @@ export default {
     },
 
     paneOneStyles() {
-      const { currentSize, minSize, maxSize, styleType, dragging } = this
+      const {
+        limitSize: { min, max },
+        currentSize,
+        styleType,
+        dragging,
+        useTransition,
+      } = this
       const style = {
         [styleType]: currentSize,
       }
-      if (minSize) {
-        style[`min-${styleType}`] = minSize
+      if (min) {
+        style[`min-${styleType}`] = min
       }
-      if (maxSize) {
-        style[`max-${styleType}`] = maxSize
+      if (max) {
+        style[`max-${styleType}`] = max
       }
-      if (dragging) {
+      if (dragging || !useTransition) {
         style['transition'] = 'none'
         style['animation'] = 'none'
       }
@@ -168,11 +214,28 @@ export default {
 
   watch: {
     sizes(curr) {
-      this.$emit('resize', curr[0], curr[1])
+      const { $basicLayout, paneOneStyles, styleType } = this
+      const component = this.$refs.one
+      this.$emit('resize', curr[0], curr[1], component)
+      if ($basicLayout) {
+        const styles = { ...paneOneStyles }
+        if (/%$/.test(styles[styleType])) {
+          styles[styleType] = this.getPercentCurrentSize()
+        }
+        $basicLayout.$emit('split-resize', styles, component)
+      }
     },
 
     initialSize(size) {
       this.currentSize = size
+    },
+
+    minSize(size) {
+      this.limitSize.min = size
+    },
+
+    maxSize(size) {
+      this.limitSize.max = size
     },
 
     currentSize() {
@@ -182,6 +245,16 @@ export default {
     throttle() {
       this.updateHandler()
     },
+
+    dragging(val) {
+      const { $basicLayout } = this
+      const component = this.$refs.one
+      const type = val ? 'start' : 'end'
+      this.$emit(`resize-${type}`, component)
+      if ($basicLayout) {
+        $basicLayout.$emit(`split-resize-${type}`, component)
+      }
+    },
   },
 
   created() {
@@ -190,9 +263,81 @@ export default {
 
   mounted() {
     this.updateSizes()
+
+    const { one } = this.$refs
+    const elem = one.$el
+    addTransitionStartListener(elem, this.onTransitionStart)
+    addTransitionEndListener(elem, this.onTransitionEnd)
+    addAnimationStartListener(elem, this.onTransitionStart)
+    addAnimationEndListener(elem, this.onTransitionEnd)
+  },
+
+  beforeDestroy() {
+    const { one } = this.$refs
+    const elem = one.$el
+    removeTransitionStartListener(elem, this.onTransitionStart)
+    removeTransitionEndListener(elem, this.onTransitionEnd)
+    removeAnimationStartListener(elem, this.onTransitionStart)
+    removeAnimationEndListener(elem, this.onTransitionEnd)
+    clearTimeout(this.$updateSizeTimer)
+    clearTimeout(this.$changeSizeTimer)
   },
 
   methods: {
+    getPercentCurrentSize() {
+      const { sizes, horizontal } = this
+      const index = horizontal ? 1 : 0
+      const oneSize = sizes[0][index]
+      return `${(oneSize * 100) / (oneSize + sizes[1][index])}%`
+    },
+
+    changeSizes(size, useTransition) {
+      const { limitSize, currentSize } = this
+      const { min, max } = limitSize
+      const { minSize, maxSize, initialSize } = Object.assign({}, size)
+      const changedSize = {
+        min: minSize !== undefined ? minSize : min,
+        max: maxSize !== undefined ? maxSize : max,
+        currentSize: initialSize !== undefined ? initialSize : currentSize,
+      }
+      this.asLayout = true
+      if (
+        changedSize.min !== min ||
+        changedSize.max !== max ||
+        changedSize.currentSize !== currentSize
+      ) {
+        limitSize.min = changedSize.min
+        limitSize.max = changedSize.max
+        this.currentSize = changedSize.currentSize
+        this.useTransition = !!useTransition
+        if (!useTransition) {
+          clearTimeout(this.$changeSizeTimer)
+          this.$changeSizeTimer = setTimeout(() => {
+            this.useTransition = true
+            this.onTransitionEnd()
+          }, 100)
+        }
+      }
+    },
+
+    changeResizable(resizable) {
+      this.preventResize = !resizable
+    },
+
+    onTransitionStart() {
+      clearTimeout(this.$updateSizeTimer)
+    },
+
+    onTransitionEnd(callback) {
+      clearTimeout(this.$updateSizeTimer)
+      this.$updateSizeTimer = setTimeout(() => {
+        this.updateSizes()
+        if (typeof callback === 'function') {
+          callback()
+        }
+      }, 100)
+    },
+
     updateHandler() {
       const { throttle } = this
       this.handler =
@@ -206,16 +351,25 @@ export default {
     },
 
     updateSizes() {
-      const { one: paneOne, two: paneTwo } = this.$refs
+      const { sizes, $refs } = this
+      const { one: paneOne, two: paneTwo } = $refs
       const oneEl = paneOne.$el
       const twoEl = paneTwo.$el
-      this.sizes = [
+      const newSizes = [
         [oneEl.clientWidth, oneEl.clientHeight],
         [twoEl.clientWidth, twoEl.clientHeight],
       ]
-      if (this.forceSizing) {
-        paneOne.$emit('resize')
-        paneTwo.$emit('resize')
+      if (
+        sizes[0][0] !== newSizes[0][0] ||
+        sizes[0][1] !== newSizes[0][1] ||
+        sizes[1][0] !== newSizes[1][0] ||
+        sizes[1][1] !== newSizes[1][1]
+      ) {
+        this.sizes = newSizes
+        if (this.forceSizing) {
+          paneOne.$emit('resize')
+          paneTwo.$emit('resize')
+        }
       }
     },
 
@@ -234,6 +388,9 @@ export default {
 
     onMouseUp() {
       this.dragging = false
+      this.onTransitionEnd(() => {
+        this.currentSize = this.getPercentCurrentSize()
+      })
     },
 
     onMouseMove(event) {
@@ -245,12 +402,9 @@ export default {
         this.dragging = false
       }
 
-      if (
-        this.dragging &&
-        event.currentTarget &&
-        event.currentTarget instanceof HTMLElement
-      ) {
-        const target = event.currentTarget
+      const { dragging, reversed } = this
+      const target = event.currentTarget
+      if (dragging && target && target instanceof HTMLElement) {
         const rect = target.getBoundingClientRect()
 
         const [currentPage, targetOffset, offset] = this.isVertical
@@ -258,8 +412,9 @@ export default {
           : [event.pageY, target.offsetHeight, window.pageYOffset + rect.top]
 
         const diff = currentPage - offset
-        this.currentSize = `${(diff / targetOffset) * 100}%`
+        const percent = (diff / targetOffset) * 100
 
+        this.currentSize = `${reversed ? 100 - percent : percent}%`
         this.hasMoved = true
       }
     },
@@ -268,7 +423,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.splitter-container {
+.ice-splitter-container {
   &-item {
     width: 100%;
     height: 100%;
@@ -277,7 +432,7 @@ export default {
     padding: 0.1px 0 0 0;
     margin: -0.1px 0 0 0;
 
-    &.splitter-dragging {
+    &.ice-dragging {
       * {
         user-select: none;
       }

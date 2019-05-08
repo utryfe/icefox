@@ -30,17 +30,21 @@ export default {
       type: Boolean,
       default: false,
     },
+
+    // 布局容器中使用
+    asLayout: Boolean,
   },
 
   computed: {
     className() {
-      const { horizontal, showLine, useDefaultCursor } = this
+      const { horizontal, showLine, useDefaultCursor, asLayout } = this
       return [
-        'splitter-handle-item',
-        `splitter-handle-${horizontal ? 'horizontal' : 'vertical'}`,
+        'ice-splitter-handle-item',
+        `ice-splitter-handle-${horizontal ? 'horizontal' : 'vertical'}`,
         {
           'splitter-line-hidden': !showLine,
           'splitter-resize-cursor': !useDefaultCursor,
+          'splitter-line-layout': asLayout,
         },
       ]
     },
@@ -51,7 +55,7 @@ export default {
 <style lang="less" scoped>
 @import '../../theme/var.less';
 
-.splitter-handle {
+.ice-splitter-handle {
   &-item {
     overflow: visible;
     position: relative;
@@ -111,8 +115,7 @@ export default {
   &-vertical {
     width: 0;
     max-width: 0;
-    flex: 1;
-    flex-grow: 1; /*ie*/
+    flex: 1 1 auto;
 
     &:before {
       left: -6px;
@@ -131,6 +134,19 @@ export default {
       cursor: col-resize;
       &:before {
         cursor: col-resize;
+      }
+    }
+  }
+
+  &-horizontal,
+  &-vertical {
+    &.splitter-line-layout {
+      &:before {
+        z-index: max(@layout-aside-fixed-z-index, @layout-header-fixed-z-index + 1) + 1;
+      }
+
+      &:after {
+        background-color: @layout-aside-splitter-vertical-color;
       }
     }
   }

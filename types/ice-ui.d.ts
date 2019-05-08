@@ -1,24 +1,24 @@
 import Vue from 'vue'
 import { IceComponent } from './component'
 
-// components
-import { IceBasicLayout } from './components/basic-layout'
-import { IceSplitPanes } from './components/split-panes'
-import { IceAsideMenu, IceMenu } from './components/aside-menu'
-
 // exports
 export interface InstallationOptions {}
 export function install(vue: typeof Vue, options: InstallationOptions): void
 export type Component = IceComponent
 
-// export components
-//
-// basic-layout
-export class BasicLayout extends IceBasicLayout {}
-
-// split-panes
-export class SplitPanes extends IceSplitPanes {}
-
-// aside-menu
-export class AsideMenu extends IceAsideMenu {}
-export { IceMenu }
+// components
+export {
+  IceBasicLayout as BasicLayout,
+  IceLayout as Layout,
+  IceLayoutAside as LayoutAside,
+  IceLayoutContent as LayoutContent,
+  IceLayoutHeader as LayoutHeader,
+  IceLayoutFooter as LayoutFooter,
+  IceAsideTrigger as AsideTrigger,
+} from './components/layout'
+export { IceScrollbar as Scrollbar } from './components/scrollbar'
+export { IceSvgIcon as SvgIcon } from './components/svg-icon'
+export { IceLogoPanel as LogoPanel } from './components/logo-panel'
+export { IceSplitPanes as SplitPanes } from './components/split-panes'
+export { IceAsideMenu as AsideMenu, IceMenu } from './components/menu'
+export { IceRouterTabs as RouterTabs } from './components/router-tabs'

@@ -1,6 +1,6 @@
 {
   "name": "icefox",
-  "version": "1.0.8",
+  "version": "1.1.0",
   "description": "A library for vue app.",
   "main": "lib/index.js",
   "dependencies": {
@@ -10,10 +10,10 @@
     "lodash.debounce": "^4.0.8",
     "qs": "^6.7.0",
     "url-parse": "^1.4.7",
-    "vue-resize-directive": "^1.2.0"
+    "vue-resize-directive": "^1.2.0",
+    "element-ui": "^2.8.2"
   },
   "peerDependencies": {
-    "element-ui": "^2.5.0",
     "vue": "^2.5.0",
     "vue-router": "^3.0.6",
     "vuex": "^3.1.0"
@@ -45,14 +45,14 @@
     "lib"
   ],
   "author": {
-    "name": "stone",
+    "name": "utryfe",
     "email": "star2018@outlook.com"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://github.com/star2018/icefox.git"
+    "url": "git+ssh://github.com/utryfe/icefox.git"
   },
-  "homepage": "https://github.com/star2018/icefox#readme",
+  "homepage": "https://github.com/utryfe/icefox#readme",
   "engines": {
     "node": ">=8.3.0"
   },

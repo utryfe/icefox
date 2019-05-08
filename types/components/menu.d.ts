@@ -1,5 +1,5 @@
 import { CreateElement, VNode } from 'vue'
-import { Menu } from 'element-ui'
+import { Menu as ElementMenu } from 'element-ui'
 
 /**
  * 菜单项定义
@@ -71,46 +71,41 @@ type SubMenuPropsHandler = (
   menuItems: MenuItem[]
 ) => object
 
-export declare class IceMenu extends Menu {
-  /**
-   * 折叠展开子菜单是否使用动效过渡
-   */
-  collapseTransition: boolean
-
+export declare class Menu extends ElementMenu {
   /**
    * 菜单项显示名称属性名（render）
    */
-  titleProp?: 'title' | string | TitleRender
+  titleProp?: TitleRender | 'title' | string
 
   /**
    * 分组名属性名（render）
    */
-  groupTitleProp?: 'groupTitle' | string | TitleRender
+  groupTitleProp?: TitleRender | 'groupTitle' | string
 
   /**
    * 子菜单属性名
    */
-  childrenProp?: 'children' | string | PropHandler
+  childrenProp?: PropHandler | 'children' | string
 
   /**
    * 主键属性名（key）
    */
-  indexProp?: 'id' | string | PropHandler
+  indexProp?: PropHandler | 'id' | string
 
   /**
    * 菜单项被禁用属性名
    */
-  disabledProp?: 'disabled' | string | PropHandler
+  disabledProp?: PropHandler | 'disabled' | string
 
   /**
    * 路由项属性名
    */
-  routeProp?: 'route' | string | PropHandler
+  routeProp?: PropHandler | 'route' | string
 
   /**
    * 图标项属性名
    */
-  iconProp?: 'icon' | string | IconRender
+  iconProp?: IconRender | 'icon' | string
 
   /**
    * 图标库样式名
@@ -118,24 +113,36 @@ export declare class IceMenu extends Menu {
   iconLibName?: 'iconfont' | string
 
   /**
+   * 图标类型，font为字体图标，svg为svg格式图标
+   */
+  iconType?: 'font' | 'svg'
+
+  /**
    * 获取菜单项的属性（优先级更高）
    */
-  getMenuItemProps?: MenuItemPropsHandler
+  menuItemProps?: MenuItemPropsHandler | object
 
   /**
    * 获取子菜单属性（优先级更高）
    */
-  getSubMenuProps?: SubMenuPropsHandler
+  subMenuProps?: SubMenuPropsHandler | object
 
   /**
    * 子菜单浮层的样式名
    */
-  popperClass?: string
+  popperClass?: string | string[] | object
 
   /**
    * 菜单树数据（数组）
    */
   menuItems?: MenuItem[]
+}
+
+export declare class IceMenu extends Menu {
+  /**
+   * 折叠展开子菜单是否使用动效过渡
+   */
+  collapseTransition: boolean
 }
 
 export declare class IceAsideMenu extends IceMenu {}

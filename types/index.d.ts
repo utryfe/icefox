@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import VueRouter from 'vue-router'
+import VueRouter, { RouteRecord } from 'vue-router'
 import { Store } from 'vuex'
 import { AxiosStatic } from 'axios'
 import * as IceFox from './ice-ui'
@@ -35,6 +35,17 @@ interface DebugStatic {
    * 输入 error 级别的调试日志
    */
   error(...args: any[]): void
+}
+
+declare module 'vue-router/types/router' {
+  interface VueRouter {
+    /**
+     * 获取当前路由记录状态码
+     * 若非 403、404、500 等，则返回 0，否则返回状态码
+     * @param to
+     */
+    getRoutingStatus: (to: RouteRecord) => number
+  }
 }
 
 declare module 'vue/types/vue' {

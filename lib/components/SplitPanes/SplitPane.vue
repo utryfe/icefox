@@ -19,6 +19,11 @@ export default {
     },
 
     /**
+     * 是否反转flex位置
+     */
+    reversed: Boolean,
+
+    /**
      * 是否强制同步设置内容元素大小
      */
     forceSizing: Boolean,
@@ -26,9 +31,22 @@ export default {
 
   computed: {
     className() {
-      const { position } = this
-      return ['splitter-pane-item', `splitter-pane-${position}`]
+      const { position, reversed } = this
+      return [
+        'ice-splitter-pane-item',
+        `ice-splitter-pane-${position}`,
+        {
+          'ice-flex-reversed': reversed,
+        },
+      ]
     },
+  },
+
+  created() {
+    this.$on('split-size-change', (...args) => this.$emit('size-change', ...args))
+    this.$on('split-resizable-change', (...args) =>
+      this.$emit('resizable-change', ...args)
+    )
   },
 
   mounted() {
@@ -55,9 +73,20 @@ export default {
 }
 </script>
 
+<style lang="less">
+.ice-splitter-pane-item {
+  & > .ice-layout,
+  & > .ice-layout-aside,
+  & > .ice-layout-content {
+    height: 100%;
+  }
+}
+</style>
+
 <style lang="less" scoped>
 @import '../../theme/var.less';
-.splitter-pane {
+
+.ice-splitter-pane {
   &-item {
     margin: 0;
     padding: 0;
@@ -71,13 +100,20 @@ export default {
 
   &-left,
   &-top {
-    flex: inherit;
+    flex: none;
+
+    &.ice-flex-reversed {
+      flex: 1 1 auto;
+    }
   }
 
   &-right,
   &-bottom {
-    flex: 1;
-    flex-grow: 1; /*ie*/
+    flex: 1 1 auto;
+
+    &.ice-flex-reversed {
+      flex: none;
+    }
   }
 
   &-top,
