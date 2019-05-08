@@ -62,10 +62,11 @@ export default {
     margin: 0;
     padding: 0;
     border: none;
-    transition: width @layout-pane-transition-duration ease-out,
-      min-width @layout-pane-transition-duration ease-out,
-      height @layout-pane-transition-duration ease-out,
-      min-height @layout-pane-transition-duration ease-out;
+    transition: width @layout-collapse-transition-duration ease-out,
+      min-width @layout-collapse-transition-duration ease-out,
+      height @layout-collapse-transition-duration ease-out,
+      min-height @layout-collapse-transition-duration ease-out,
+      padding @layout-collapse-transition-duration ease-out;
   }
 
   &-left,

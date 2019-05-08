@@ -1,6 +1,6 @@
 {
   "name": "icefox",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A library for vue app.",
   "main": "lib/index.js",
   "dependencies": {

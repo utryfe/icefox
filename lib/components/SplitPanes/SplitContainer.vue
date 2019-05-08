@@ -16,7 +16,8 @@
 
     <split-handle
       :horizontal="horizontal"
-      :disabled="disabled"
+      :show-line="showSplitLine"
+      :use-default-cursor="!resizable"
       @mousedown.native.stop.prevent="onMouseDown"
       @dblclick.native.stop.prevent="onDblClick"
     />
@@ -48,11 +49,19 @@ export default {
     },
 
     /**
-     * 禁止调节大小
+     * 可调节大小的
      */
-    disabled: {
+    resizable: {
       type: Boolean,
-      default: false,
+      default: true,
+    },
+
+    /**
+     * 显示分割线
+     */
+    showSplitLine: {
+      type: Boolean,
+      default: true,
     },
 
     /**
@@ -211,14 +220,16 @@ export default {
     },
 
     onDblClick() {
-      if (!this.hasMoved && this.dblClickReset) {
+      if (!this.hasMoved && this.dblClickReset && this.resizable) {
         this.currentSize = this.initialSize
       }
     },
 
     onMouseDown() {
-      this.dragging = true
-      this.hasMoved = false
+      if (this.resizable) {
+        this.dragging = true
+        this.hasMoved = false
+      }
     },
 
     onMouseUp() {

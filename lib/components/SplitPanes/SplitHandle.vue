@@ -16,9 +16,17 @@ export default {
     },
 
     /**
-     * 被禁用的
+     * 显示分割线
      */
-    disabled: {
+    showLine: {
+      type: Boolean,
+      default: true,
+    },
+
+    /**
+     * 使用默认的光标样式
+     */
+    useDefaultCursor: {
       type: Boolean,
       default: false,
     },
@@ -26,11 +34,14 @@ export default {
 
   computed: {
     className() {
-      const { horizontal, disabled } = this
+      const { horizontal, showLine, useDefaultCursor } = this
       return [
         'splitter-handle-item',
         `splitter-handle-${horizontal ? 'horizontal' : 'vertical'}`,
-        { 'splitter-disabled': disabled },
+        {
+          'splitter-line-hidden': !showLine,
+          'splitter-resize-cursor': !useDefaultCursor,
+        },
       ]
     },
   },
@@ -49,10 +60,6 @@ export default {
     margin: 0;
     flex: none;
 
-    &.splitter-disabled {
-      display: none;
-    }
-
     &:before {
       content: '';
       position: absolute;
@@ -67,26 +74,37 @@ export default {
       left: 0;
       top: 0;
     }
+
+    &.splitter-line-hidden {
+      &:after {
+        display: none;
+      }
+    }
   }
 
   &-horizontal {
     width: 100%;
     height: 0;
     max-height: 0;
-    cursor: row-resize;
 
     &:before {
       left: 0;
       top: -6px;
       width: 100%;
       height: 12px;
-      cursor: row-resize;
     }
 
     &:after {
       background-color: @layout-splitter-horizontal-color;
       width: 100%;
       height: 1px;
+    }
+
+    &.splitter-resize-cursor {
+      cursor: row-resize;
+      &:before {
+        cursor: row-resize;
+      }
     }
   }
 
@@ -95,20 +113,25 @@ export default {
     max-width: 0;
     flex: 1;
     flex-grow: 1; /*ie*/
-    cursor: col-resize;
 
     &:before {
       left: -6px;
       top: 0;
       width: 12px;
       height: 100%;
-      cursor: col-resize;
     }
 
     &:after {
       background-color: @layout-splitter-vertical-color;
       width: 1px;
       height: 100%;
+    }
+
+    &.splitter-resize-cursor {
+      cursor: col-resize;
+      &:before {
+        cursor: col-resize;
+      }
     }
   }
 }

@@ -1,22 +1,27 @@
 <template>
   <split-panes
     :class="className"
-    :disabled="asideCollapsed || !resizable"
+    :resizable="resizable && showAside && !asideCollapsed"
+    :show-split-line="showAside"
     :min-size="splitSize.min"
     :max-size="splitSize.max"
     :initial-size="splitSize.default"
     :force-sizing="forceSizing"
     @resize="handleResize"
   >
-    <div class="aside-panel" slot="left">
-      <div class="header-wrapper">
+    <transition
+      enter-active-class="animated fadeInLeft"
+      leave-active-class="animated fadeOutLeft"
+      slot="left"
+    >
+      <div class="aside-pane" v-show="showAside">
         <transition
           enter-active-class="animated fadeIn"
           leave-active-class="animated fadeOut"
         >
           <div
+            class="collapse-trigger"
             v-if="collapsible"
-            class="trigger"
             :title="asideCollapsed ? '展开' : '收起'"
             @click="asideCollapsed = !asideCollapsed"
           >
@@ -24,36 +29,40 @@
           </div>
         </transition>
 
-        <div class="platform-wrapper" @click="handleHomeClick">
-          <div class="platform-logo">
+        <div
+          class="aside-header"
+          v-show="showAsideHeader"
+          @click="handleAsideHeaderClick"
+        >
+          <div class="aside-header-logo">
             <slot name="logo" />
           </div>
 
-          <template v-if="collapseTransition">
-            <transition
-              enter-active-class="animated fadeInLeftLittle"
-              leave-active-class="animated fadeOutLeftLittle"
-            >
-              <div v-if="!asideCollapsed" class="platform-name">
-                <slot name="platform" />
-              </div>
-            </transition>
-          </template>
-          <div v-else class="platform-name">
-            <slot name="platform" />
-          </div>
+          <transition
+            enter-active-class="animated fadeInLeftLittle"
+            leave-active-class="animated fadeOutLeftLittle"
+          >
+            <div class="aside-header-title" v-show="!asideCollapsed">
+              <slot name="system" />
+            </div>
+          </transition>
+        </div>
+
+        <div class="aside-content">
+          <slot name="aside" />
         </div>
       </div>
+    </transition>
 
-      <div class="menu-wrapper">
-        <slot name="menu" />
-      </div>
-    </div>
-
-    <div class="body-panel" slot="right">
-      <div class="header">
-        <slot name="header" />
-      </div>
+    <div class="body-pane" slot="right">
+      <transition
+        enter-active-class="animated slideInDown"
+        leave-active-class="animated slideOutUp"
+      >
+        <div v-show="showMainHeader" class="main-header">
+          <slot name="header" />
+        </div>
+      </transition>
       <slot />
     </div>
   </split-panes>
@@ -108,25 +117,62 @@ export default {
       type: Boolean,
       default: true,
     },
+
+    /**
+     * 显示左侧边栏
+     */
+    showAside: {
+      type: Boolean,
+      default: true,
+    },
+
+    /**
+     * 显示侧边栏头部
+     */
+    showAsideHeader: {
+      type: Boolean,
+      default: true,
+    },
+
+    /**
+     * 显示顶部菜单栏
+     */
+    showMainHeader: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   data() {
     const { collapsed } = this
     return {
       resizing: false,
+      animationDisabled: true,
       asideCollapsed: !!collapsed,
     }
   },
 
   computed: {
     className() {
-      const { collapsible, asideCollapsed, collapseTransition } = this
+      const {
+        showAside,
+        showAsideHeader,
+        showMainHeader,
+        collapsible,
+        asideCollapsed,
+        collapseTransition,
+        animationDisabled,
+      } = this
       return [
         'basic-layout',
         {
-          'layout-collapsible': collapsible,
+          'layout-collapsible': collapsible && showAside,
           'layout-collapsed': asideCollapsed,
+          'layout-aside-none': !showAside,
+          'layout-main-header-none': !showMainHeader,
           'layout-collapse-transition-none': !collapseTransition,
+          'layout-aside-header-none': !showAsideHeader,
+          'layout-aside-animation-disabled': animationDisabled,
         },
       ]
     },
@@ -143,7 +189,7 @@ export default {
     },
 
     splitSize() {
-      const { asideSize, asideCollapsed } = this
+      const { showAside, asideSize, asideCollapsed } = this
       const argType = typeof asideSize
       const size = Object.assign(
         {
@@ -154,7 +200,12 @@ export default {
         },
         argType === 'string' || argType === 'number' ? { default: asideSize } : asideSize
       )
-      if (asideCollapsed) {
+      if (!showAside) {
+        Object.assign(size, {
+          min: 0,
+          default: 0,
+        })
+      } else if (asideCollapsed) {
         Object.assign(size, {
           min: size.collapsed,
           default: size.collapsed,
@@ -170,6 +221,7 @@ export default {
     },
 
     asideCollapsed(val) {
+      this.animationDisabled = false
       this.$emit('update:collapsed', !!val)
       this.$emit('collapse-change', !!val)
     },
@@ -179,8 +231,8 @@ export default {
     handleResize(...dimensions) {
       this.$emit('resize', ...dimensions)
     },
-    handleHomeClick() {
-      this.$emit('home-click')
+    handleAsideHeaderClick() {
+      this.$emit('aside-header-click')
     },
   },
 }
@@ -216,8 +268,8 @@ body {
     }
   }
 
-  & > .splitter-pane-left {
-    .platform-wrapper > .platform-logo {
+  & > .splitter-pane-left > .aside-pane {
+    & > .aside-header > .aside-header-logo {
       & > img {
         max-height: 61.8%;
       }
@@ -227,18 +279,8 @@ body {
   &.layout-collapse-transition-none {
     & > .splitter-pane-left {
       transition: none;
-      .aside-panel {
-        .menu-wrapper {
-          & > .ice-aside-menu {
-            transition: none;
-
-            /* & > .el-menu-item,
-            & > .el-menu-item-group > ul > .el-menu-item,
-            & > .el-submenu > .el-submenu__title {
-              transition: none;
-            }*/
-          }
-        }
+      .aside-pane > .aside-content > .ice-aside-menu {
+        transition: none;
       }
     }
   }
@@ -250,15 +292,15 @@ body {
 
 /*******************************************/
 
-.header {
+.main-header {
   padding-right: 8px;
 }
 
-.platform-wrapper {
+.aside-header {
   padding: 0 16px;
 }
 
-.platform-name {
+.aside-header-title {
   margin-left: 12px;
   color: @layout-aside-header-color;
 }
@@ -269,8 +311,8 @@ body {
   background-color: @layout-background-color;
   box-sizing: border-box;
 
-  .aside-panel,
-  .body-panel {
+  .aside-pane,
+  .body-pane {
     height: 100%;
     min-height: 100vh;
     padding-top: @layout-header-height;
@@ -278,64 +320,106 @@ body {
     position: relative;
   }
 
-  &.layout-collapsible {
-    .body-panel {
-      .header {
-        padding-left: 80px;
-      }
+  .aside-pane {
+    animation-duration: @layout-collapse-transition-duration;
+  }
+
+  &.layout-aside-none {
+    .aside-pane {
+      overflow: hidden;
     }
   }
 
-  &.layout-collapsed {
-    .aside-panel {
-      .header-wrapper {
-        .platform-wrapper {
-          .platform-logo {
-            transition: left 0.3s ease, transform 0.3s ease-in-out;
-            position: absolute;
-            left: 50%;
-            transform: translate3d(-50%, 0, 0);
-          }
-        }
-      }
+  &.layout-aside-header-none {
+    .aside-pane {
+      padding-top: 0;
+    }
+  }
+
+  &.layout-main-header-none {
+    .body-pane {
+      padding-top: 0;
+    }
+  }
+
+  &.layout-collapsible .body-pane .main-header {
+    padding-left: 80px;
+  }
+
+  &.layout-collapsed .aside-pane .aside-header {
+    .aside-header-logo {
+      animation: slideLogoToCenter @layout-collapse-transition-duration ease-in-out
+        forwards calc(@layout-collapse-transition-duration - 0.1s);
+      transition: none;
     }
   }
 
   &.layout-collapse-transition-none {
     transition: none;
+    animation: none;
 
-    .aside-panel {
-      & > .header-wrapper {
-        .platform-wrapper {
-          .platform-logo {
-            transition: none;
-          }
-        }
+    .aside-pane,
+    .body-pane {
+      transition: none;
+      animation: none;
+    }
+
+    .aside-pane .aside-header {
+      .aside-header-logo {
+        transition: none;
+        animation-duration: 0s;
+        animation-delay: 0s;
+      }
+
+      .aside-header-title {
+        transition: none;
+        animation: none;
       }
     }
 
-    &.layout-collapsed {
-      .aside-panel {
-        & > .header-wrapper {
-          .platform-wrapper {
-            .platform-logo {
-              transition: none;
-            }
-            .platform-name {
-              display: none;
-            }
-          }
-        }
+    .body-pane {
+      .main-header {
+        transition: none;
+        animation: none;
       }
+    }
+  }
+
+  &.layout-aside-animation-disabled {
+    .aside-pane .aside-header .aside-header-logo {
+      animation: none;
     }
   }
 }
 
-.aside-panel {
+.aside-pane {
   box-shadow: 2px 0 6px @layout-aside-box-shadow-color;
+  animation-duration: @layout-collapse-transition-duration;
   z-index: 1;
 
-  .header-wrapper {
+  .collapse-trigger {
+    font-size: 16px;
+    position: absolute;
+    z-index: 2;
+    padding: 0 24px;
+    height: @layout-header-height;
+    line-height: @layout-header-height;
+    vertical-align: middle;
+    text-align: center;
+    top: 0;
+    right: 0;
+    transform: translate3d(100%, 0, 0);
+    cursor: pointer;
+    animation-duration: 0.3s;
+    transition: background-color 0.3s, color 0.1s;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+      color: rgba(0, 0, 0, 0.95);
+    }
+  }
+
+  .aside-header {
     position: absolute;
     background-color: @layout-aside-header-background-color;
     box-shadow: 1px 1px 0 0 @layout-aside-header-border-color;
@@ -345,71 +429,44 @@ body {
     left: 0;
     top: 0;
     z-index: 1;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    overflow: hidden;
 
-    .trigger {
-      font-size: 16px;
-      position: absolute;
-      z-index: 2;
-      padding: 0 24px;
-      height: @layout-header-height;
-      line-height: @layout-header-height;
-      vertical-align: middle;
-      text-align: center;
+    .aside-header-logo {
+      display: flex;
+      flex: none;
+      align-items: center;
+      height: 100%;
+      font-size: 0;
+      position: relative;
+      left: 0;
       top: 0;
-      right: 0;
-      transform: translate3d(100%, 0, 0);
-      cursor: pointer;
-      animation-duration: 0.3s;
-      transition: background-color 0.3s, color 0.1s;
-
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.05);
-        color: rgba(0, 0, 0, 0.95);
-      }
+      z-index: 1;
+      animation: slideLogoToLeft calc(@layout-collapse-transition-duration + 0.3s)
+        ease-out forwards;
     }
 
-    .platform-wrapper {
-      box-sizing: border-box;
-      display: flex;
-      height: 100%;
-      align-items: center;
-      flex-wrap: nowrap;
+    .aside-header-title {
+      animation-duration: 0.5s;
       overflow: hidden;
-
-      .platform-logo {
-        position: relative;
-        z-index: 1;
-        font-size: 0;
-        left: 0;
-        top: 0;
-        height: 100%;
-        display: flex;
-        flex: none;
-        align-items: center;
-        transform: translate3d(0, 0, 0);
-        transition: left 0.3s ease-out;
-      }
-
-      .platform-name {
-        animation-duration: 0.5s;
-        overflow: hidden;
-        white-space: nowrap;
-        word-break: keep-all;
-        flex: none;
-      }
+      white-space: nowrap;
+      word-break: keep-all;
+      flex: none;
     }
   }
 
-  .menu-wrapper {
+  .aside-content {
     height: 100%;
     background-color: @layout-aside-background-color;
   }
 }
 
-.body-panel {
+.body-pane {
   z-index: 0;
 
-  .header {
+  .main-header {
     box-sizing: border-box;
     width: 100%;
     padding-left: 24px;
@@ -425,6 +482,7 @@ body {
     background: @layout-header-background-color;
     box-shadow: 0 1px 4px @layout-header-box-shadow-color;
     transition: padding-left 0.3s ease-out;
+    animation-duration: 0.3s;
   }
 }
 
@@ -457,6 +515,36 @@ body {
   to {
     opacity: 0;
     transform: translate3d(-24px, 0, 0);
+  }
+}
+
+@keyframes slideLogoToCenter {
+  from {
+    position: absolute;
+    left: 50%;
+    margin-left: calc(-50% + 16px);
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    position: absolute;
+    left: 50%;
+    margin-left: 0;
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes slideLogoToLeft {
+  from {
+    position: relative;
+    left: 50%;
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  to {
+    position: relative;
+    left: 0;
+    transform: translate3d(0, 0, 0);
   }
 }
 </style>
