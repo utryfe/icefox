@@ -3,6 +3,10 @@
   "version": "1.1.0",
   "description": "A library for vue app.",
   "main": "lib/index.js",
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  },
   "dependencies": {
     "animate.css": "^3.7.0",
     "axios": "^0.18.0",
@@ -28,6 +32,7 @@
     "lint-staged": "^8.1.5",
     "vue": "^2.5.0",
     "vue-router": "^3.0.6",
+    "vuepress": "^0.14.11",
     "vuex": "^3.1.0"
   },
   "gitHooks": {

@@ -43,6 +43,7 @@ export default {
     & > .el-scrollbar__bar {
       .el-scrollbar__thumb {
         background-color: #656667;
+        opacity: 0.75;
       }
     }
   }

@@ -1,6 +1,7 @@
 .DS_Store
 node_modules
 build
+docs
 
 # Log files
 npm-debug.log*
@@ -16,6 +17,7 @@ yarn-error.log*
 *.sln
 *.sw*
 .project
+deploy.sh
 
 test/unit/coverage
 /.gitignore

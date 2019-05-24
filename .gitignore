@@ -15,3 +15,4 @@ yarn-error.log*
 *.sln
 *.sw*
 .project
+/docs/.vuepress/dist/
