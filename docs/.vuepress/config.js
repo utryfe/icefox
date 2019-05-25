@@ -1,8 +1,20 @@
+const path = require('path')
+
 module.exports = {
   title: 'icefox',
   description: '基于 ElementUI 的企业中后台应用框架❤️',
   base: '/icefox-docs/',
   port: 12306,
+  configureWebpack: () => {
+    return {
+      resolve: {
+        alias: {
+          '@': path.resolve('lib'),
+          '@@': path.resolve('lib/components'),
+        },
+      },
+    }
+  },
   themeConfig: {
     nav: [{ text: '指南', link: '/guide/' }, { text: '配置', link: '/config/' }],
     sidebar: {

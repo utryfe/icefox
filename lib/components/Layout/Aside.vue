@@ -86,7 +86,12 @@ export default {
     justifyHeight: Boolean,
   },
 
-  inject: ['$basicLayout'],
+  inject: {
+    $basicLayout: {
+      from: '$basicLayout',
+      default: null,
+    },
+  },
 
   data() {
     const { visible, width, collapsed, fixed } = this
@@ -231,11 +236,13 @@ export default {
       immediate: true,
       handler(state) {
         const { $basicLayout, $parent, useTransition } = this
-        $basicLayout.$emit(
-          'aside-state-change',
-          { ...state, transition: useTransition },
-          this
-        )
+        if ($basicLayout) {
+          $basicLayout.$emit(
+            'aside-state-change',
+            { ...state, transition: useTransition },
+            this
+          )
+        }
         $parent.$emit('split-resizable-change', !state.collapsed && state.visible)
       },
     },
@@ -243,30 +250,36 @@ export default {
 
   created() {
     const { $basicLayout } = this
-    $basicLayout.$on('aside-state-change', this.updateState)
-    $basicLayout.$on('split-resize-start', this.handleResizeStart)
-    $basicLayout.$on('split-resize-end', this.handleResizeEnd)
-    $basicLayout.$on('split-resize', this.handleResize)
-    $basicLayout.$on('header-state-change', this.syncHeaderSize)
+    if ($basicLayout) {
+      $basicLayout.$on('aside-state-change', this.updateState)
+      $basicLayout.$on('split-resize-start', this.handleResizeStart)
+      $basicLayout.$on('split-resize-end', this.handleResizeEnd)
+      $basicLayout.$on('split-resize', this.handleResize)
+      $basicLayout.$on('header-state-change', this.syncHeaderSize)
+    }
     this.syncParentSize(false)
   },
 
   mounted() {
     const { $basicLayout, state, useTransition } = this
-    $basicLayout.$emit(
-      'aside-state-change',
-      { ...state, transition: useTransition },
-      this
-    )
+    if ($basicLayout) {
+      $basicLayout.$emit(
+        'aside-state-change',
+        { ...state, transition: useTransition },
+        this
+      )
+    }
   },
 
   beforeDestroy() {
     const { $basicLayout } = this
-    $basicLayout.$off('aside-state-change', this.updateState)
-    $basicLayout.$off('split-resize-start', this.handleResizeStart)
-    $basicLayout.$off('split-resize-end', this.handleResizeEnd)
-    $basicLayout.$off('split-resize', this.handleResize)
-    $basicLayout.$off('header-state-change', this.syncHeaderSize)
+    if ($basicLayout) {
+      $basicLayout.$off('aside-state-change', this.updateState)
+      $basicLayout.$off('split-resize-start', this.handleResizeStart)
+      $basicLayout.$off('split-resize-end', this.handleResizeEnd)
+      $basicLayout.$off('split-resize', this.handleResize)
+      $basicLayout.$off('header-state-change', this.syncHeaderSize)
+    }
   },
 
   methods: {
@@ -299,7 +312,9 @@ export default {
         sizeStyle.width = resizeWidth
       }
       this.justify = !!(fixed && justifyHeight)
-      $basicLayout.$emit('aside-size-change', sizeStyle)
+      if ($basicLayout) {
+        $basicLayout.$emit('aside-size-change', sizeStyle)
+      }
     },
 
     updateState(state) {

@@ -88,9 +88,6 @@ export default {
 </script>
 
 <style>
-@import '~element-ui/lib/theme-chalk/index.css';
-@import '../../theme/index.css';
-
 html,
 body {
   margin: 0;
@@ -98,7 +95,7 @@ body {
   border: 0;
 }
 
-body {
+.ice-layout-body {
   font-family: 'Chinese Quote', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica,
     Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';

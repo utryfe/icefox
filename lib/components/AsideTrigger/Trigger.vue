@@ -32,7 +32,12 @@ export default {
     },
   },
 
-  inject: ['$basicLayout'],
+  inject: {
+    $basicLayout: {
+      from: '$basicLayout',
+      default: null,
+    },
+  },
 
   data() {
     const { visible } = this

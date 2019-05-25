@@ -53,8 +53,6 @@ export default {
     reversed: Boolean,
   },
 
-  inject: ['$basicLayout'],
-
   computed: {
     className() {
       const { horizontal, split } = this

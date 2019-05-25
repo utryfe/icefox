@@ -29,7 +29,12 @@ export default {
     title: String,
   },
 
-  inject: ['$basicLayout'],
+  inject: {
+    $basicLayout: {
+      from: '$basicLayout',
+      default: null,
+    },
+  },
 
   data() {
     return {

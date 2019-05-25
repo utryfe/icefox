@@ -158,7 +158,12 @@ export default {
     }
   },
 
-  inject: ['$basicLayout'],
+  inject: {
+    $basicLayout: {
+      from: '$basicLayout',
+      default: null,
+    },
+  },
 
   computed: {
     className() {
