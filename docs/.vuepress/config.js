@@ -1,4 +1,5 @@
 const path = require('path')
+require('./browserShim')
 
 module.exports = {
   title: 'icefox',
