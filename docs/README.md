@@ -1,8 +1,8 @@
 ---
 home: true
-heroImage: ./assets/img/logo_white3.png
+heroImage: /logo.png
 actionText: 快速上手 →
-actionLink: /guide/
+actionLink: /guide/introduce
 features:
   - title: 简单
     details: 基于 element-ui，也像 element-ui 一样易于被使用。

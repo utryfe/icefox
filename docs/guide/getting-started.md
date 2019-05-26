@@ -1,6 +1,7 @@
 # 快速上手
 
-以下名称 **ut-builder** 均指 [@vue/cli](https://cli.vuejs.org/zh/) 命名行构建工具插件 [vue-cli-plugin-ut-builder](https://www.npmjs.com/package/vue-cli-plugin-ut-builder)。
+以下名称 **ut-builder** 均指构建工具 [vue-cli-plugin-ut-builder](https://www.npmjs.com/package/vue-cli-plugin-ut-builder)，
+其本质上是 [@vue/cli](https://cli.vuejs.org/zh/) 的插件。
 
 ## 环境准备
 
@@ -57,7 +58,7 @@ nrm use taobao
 
 **ut-builder** 本身并没有提供完整的脚手架工具，因为 @vue/cli 提供的脚手架已经足够好用了。甚至你还可以基于 @vue/cli 的配置，定制或开发自己喜欢的脚手架。
 
-另外，[前面](./#构建工具) 我们也了解到，ut-builder 本身就是一个 @vue/cli 插件。
+另外，[前面](./introduce.md#构建工具) 我们也了解到，ut-builder 本身就是一个 @vue/cli 插件。
 所以，你可以**先使用 @vue/cli 初始化创建工程，然后再添加 [ut-builder](https://www.npmjs.com/package/vue-cli-plugin-ut-builder) 插件**。
 
 如果你只想单独使用 ut-builder 这个插件也是可以的，甚至你还可以只使用 icefox 包里面的一些组件。
@@ -132,7 +133,7 @@ npm run serve
 ut-builder 会考虑到用户自己的配置并做相应增强。其他命令行插件的构建行为也有可能会与 ut-builder 的构建行为相冲突。
 :::
 
-**ut-builder** 提供了较丰富的 [构建配置项](../config/#构建配置)，能满足常用的 App 构建需求。这也是上面提到的，你可以把它 **单独作为一个构建插件** 来使用的原因。
+**ut-builder** 提供了较丰富的 [构建配置项](../config/builder.md)，能满足常用的 App 构建需求。这也是上面提到的，你可以把它 **单独作为一个构建插件** 来使用的原因。
 
 在这里，结合 icefox，我们看看还能多做一些什么。
 
@@ -236,7 +237,7 @@ export default {
 但这里并不是照搬他们的实现。
 
 事实上，受这种思想的启发，我们觉得这是个不错的提效手段，但 Nuxt 偏向于服务端渲染，
-UmiJS 是 React 派系，而我们趋向于辅助应用开发，并尽力帮助小伙伴们降低企业应用的开发门槛。
+UmiJS 是 React 派系，而 icefox 趋向于辅助应用开发，并尽力帮助小伙伴们降低企业应用开发的门槛。
 
 如果你不喜欢以这种方式来构建你的应用，那作为一个普通的构建插件和组件包，你也能用上一些东西。如果你很感兴趣，那么我们接下来就会了解更多了。
 
@@ -297,7 +298,7 @@ UmiJS 是 React 派系，而我们趋向于辅助应用开发，并尽力帮助�
 └── vue.config.js               // 构建配置文件
 ```
 
-这里我们删除了 **src** 目录下面的 **router.js** 和 **store.js** 文件，也在**项目根目录**下新建了一个 **vue.config.js** 文件（如果没有的话）。
+这里我们删除了 **src** 目录下面的 **router.js** 和 **store.js** 文件，也在**项目根目录**下新建了一个 [vue.config.js](https://cli.vuejs.org/zh/config/#vue-config-js) 文件（如果没有的话）。
 另外，我们还修改了**路由组件的文件后缀名称**，将 **.vue** 改为了 **.route.vue**。
 
 :::tip 提示
@@ -352,7 +353,8 @@ export default {
 现在我们暂时不需要了解 **main.js** 内容的具体细节，后面我们会有专门的文档来说明。但从代码来看，
 我们可以看出，应用 **插件的安装**，以及 **Router**、**Store**、**App** 的实例化，都是由框架来接管了。
 
-现在我们还需要更改构建配置文件，并启用路由代码自动生成以及框架能力支持。这是在 **vue.config.js** 里面配置的。下面是个参考：
+现在我们还需要更改构建配置文件，并启用路由代码自动生成以及 App 框架能力。这是在 **vue.config.js** 里面配置( `preprocess` )的。
+下面是个参考：
 
 ```js{3}
 module.exports = {
@@ -362,6 +364,116 @@ module.exports = {
 }
 ```
 
-重新运行构建命令 `npm run serve`，你应该会看到类似下面这样的控制台输出：
+重新运行构建命令 `npm run serve`，不出意外的话，你应该会看到类似下面这样的控制台输出：
 
 ![预处理构建输出](../assets/images/build-preprocess.png)
+
+而浏览器网页地址栏却变成了 `localhost:8080/#/404`，且示例的 Home 页面路由(`/`) 也没有正常显示。
+不要着急，我们还需要进行一些小的调整才能使得页面显示正常。
+
+你可能也已经注意到了，在构建控制台里会有一个提示内容：
+
+![构建提示](../assets/images/build-info-index.png)
+
+意思是需要在 `src/views` 目录下添加一个 `index.route.vue` 单文件组件。按照提示，我们新建一个组件试试。
+组件模板内容任你喜欢好了。建好后，我们再把浏览器地址更改为 `localhost:8080/#/`，是不是已经看到你刚刚创建的内容了？
+
+这里，我们知道了，在一个目录下面，命名为 `index.route.vue` 的单文件组件，会被当作该目录路径下的路由( `Layout` )组件。
+
+你也可以接着往 `src/views` 目录下添加更多的单文件组件（路由组件文件名称以 `.route.vue` 结尾）或嵌套目录。
+
+下面是一个随意添加的目录文件结构：
+
+```{4,6,7,8,9,11}
+src/views
+├── user
+│   ├── vip
+│   │   └── index.route.vue
+│   ├── boo.vue
+│   ├── detail.route.vue
+│   └── index.route.vue
+├── About.route.vue
+├── Home.route.vue
+├── Normal.vue
+└── index.route.vue
+```
+
+:::tip 提示
+打开浏览器(Chrome)开发者工具，通过快捷键(`⌘ P` 或 `Ctrl P`)打开资源搜索栏，键入 `.code/index`搜索，即可找到生成的路由配置代码文件。
+在项目的 `node_modules/.code` 目录下，你也可以找到这一代码文件。
+:::
+
+根据以上目录文件结构，生成的路由配置代码如下：
+
+```js{8,15,22,29,40,47}
+const router = {
+  mode: 'hash',
+  base: '/',
+  routes: [
+    {
+      filePath: 'src/views/index.route.vue',
+      name: '/',
+      path: '/',
+      component: compIndex,
+      props: mapRouteParamsToProps,
+      children: [
+        {
+          filePath: 'src/views/user/index.route.vue',
+          name: 'user',
+          path: '/user',
+          component: compUserIndex,
+          props: mapRouteParamsToProps,
+          children: [
+            {
+              filePath: 'src/views/user/detail.route.vue',
+              name: 'user/detail',
+              path: 'detail',
+              component: compUserDetail,
+              props: mapRouteParamsToProps,
+            },
+            {
+              filePath: 'src/views/user/vip/index.route.vue',
+              name: 'user/vip',
+              path: 'vip',
+              component: compUserVipIndex,
+              props: mapRouteParamsToProps,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      filePath: 'src/views/About.route.vue',
+      name: 'About',
+      path: '/about',
+      component: compAbout,
+      props: mapRouteParamsToProps,
+    },
+    {
+      filePath: 'src/views/Home.route.vue',
+      name: 'Home',
+      path: '/home',
+      component: compHome,
+      props: mapRouteParamsToProps,
+    },
+  ],
+}
+```
+
+其中一些变量是对导入组件的引用。另外，在构建控制台也会有以下提示内容：
+
+![构建路由提示](../assets/images/build-info-router.png)
+
+正如你所看到的那样，创建或更新路由组件文件后，构建工具会自动生成新的代码，并作出相应的提示。
+这一过程中你也不需要重新启动构建。
+ut-builder 提供了 `3` 种模式来生成路由代码，并完善支持动态参数路由、命名路由以及嵌套子路由。
+这里我们不作过多的展开，后面会有专门的文档。如果你想再多尝试几下的话，这里有一些提示也许能帮到你：
+
+:::tip 提示
+`preprocess` 配置项可使用对象传参，属性 `appNestedRoutes` 可指定嵌套模式， 有 3 个枚举值，分别为 `auto`、`manual`、`none`。
+默认为 `auto` 模式。`manual` 模式下，目录名称以`[]`包裹的，表示需要生成嵌套子路由。任意模式下名称以 `~` 开头的路由文件或目录，将会提升为根路由子节点。
+以 `@` 开头的路由文件或目录，表示命名路由，而以 `_` 开头的表示动态参数路由，动态参数路由以 `_` 结尾表示可选参数。`@` 和 `_` 这两个符号可通过配置来变更。
+:::
+
+基于以上了解，我们就可以将示例的 `Home` 组件对应的路由页面重新显示出来了，访问 `/home` 路由即可。
+你也可以修正下示例 `src/App.vue` 文件内的路由链接地址信息。

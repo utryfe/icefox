@@ -15,18 +15,69 @@ module.exports = {
     },
   },
   themeConfig: {
-    nav: [{ text: '指南', link: '/guide/' }, { text: '配置', link: '/config/' }],
+    nav: [
+      { text: '指南', link: '/guide/introduce' },
+      { text: '组件', link: '/component/installation' },
+      { text: '配置', link: '/config/builder' },
+    ],
     sidebar: {
       '/guide/': [
         {
           title: '指南',
           collapsable: false,
-          children: ['', 'getting-started'],
+          children: [
+            //
+            'introduce',
+            'getting-started',
+          ],
+        },
+        {
+          title: '进阶',
+          collapsable: false,
+          children: [
+            //
+            'mock',
+            'request',
+            'routing',
+            'store-module',
+          ],
         },
       ],
-      '/config/': [''],
-      '/api/': [''],
+      '/component/': [
+        {
+          title: '开发指南',
+          collapsable: false,
+          children: [
+            //
+            'installation',
+            'customize-theme',
+          ],
+        },
+        {
+          title: '组件',
+          collapsable: false,
+          children: [
+            //
+            'layout',
+            'aside-menu',
+            'router-tabs',
+          ],
+        },
+      ],
+      '/config/': [
+        {
+          title: '配置参考',
+          collapsable: false,
+          children: [
+            //
+            'builder',
+            'application',
+            'plugins',
+          ],
+        },
+      ],
     },
+    //
     repo: 'utryfe/icefox',
     docsRepo: 'utryfe/icefox',
     docsDir: 'docs',
