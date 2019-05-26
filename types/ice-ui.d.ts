@@ -7,18 +7,33 @@ export function install(vue: typeof Vue, options: InstallationOptions): void
 export type Component = IceComponent
 
 // components
-export {
-  IceBasicLayout as BasicLayout,
-  IceLayout as Layout,
-  IceLayoutAside as LayoutAside,
-  IceLayoutContent as LayoutContent,
-  IceLayoutHeader as LayoutHeader,
-  IceLayoutFooter as LayoutFooter,
-  IceAsideTrigger as AsideTrigger,
+import {
+  IceBasicLayout,
+  IceLayout,
+  IceLayoutAside,
+  IceLayoutContent,
+  IceLayoutHeader,
+  IceLayoutFooter,
+  IceAsideTrigger,
 } from './components/layout'
-export { IceScrollbar as Scrollbar } from './components/scrollbar'
-export { IceSvgIcon as SvgIcon } from './components/svg-icon'
-export { IceLogoPanel as LogoPanel } from './components/logo-panel'
-export { IceSplitPanes as SplitPanes } from './components/split-panes'
-export { IceAsideMenu as AsideMenu, IceMenu } from './components/menu'
-export { IceRouterTabs as RouterTabs } from './components/router-tabs'
+import { IceScrollbar } from './components/scrollbar'
+import { IceSvgIcon } from './components/svg-icon'
+import { IceLogoPanel } from './components/logo-panel'
+import { IceSplitPanes } from './components/split-panes'
+import { IceAsideMenu } from './components/menu'
+import { IceRouterTabs } from './components/router-tabs'
+
+export { IceMenu } from './components/menu'
+export class BasicLayout extends IceBasicLayout {}
+export class Layout extends IceLayout {}
+export class LayoutAside extends IceLayoutAside {}
+export class LayoutContent extends IceLayoutContent {}
+export class LayoutHeader extends IceLayoutHeader {}
+export class LayoutFooter extends IceLayoutFooter {}
+export class AsideTrigger extends IceAsideTrigger {}
+export class Scrollbar extends IceScrollbar {}
+export class SvgIcon extends IceSvgIcon {}
+export class LogoPanel extends IceLogoPanel {}
+export class SplitPanes extends IceSplitPanes {}
+export class AsideMenu extends IceAsideMenu {}
+export class RouterTabs extends IceRouterTabs {}
