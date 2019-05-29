@@ -64,11 +64,11 @@ nrm use taobao
 如果你只想单独使用 ut-builder 这个插件也是可以的，甚至你还可以只使用 icefox 包里面的一些组件。
 后面我们会提一些需要注意的地方，但在这里，推荐你按照下面的示例，先创建一个完整的示例项目。
 
-首先我们需要 **安装 vue 官方命令行构建工具** ：
+首先我们需要 **安装 vue 官方命令行构建工具**：
 
 ```bash
 # 老版本命令行工具会对新版工具造成影响
-# 如果你已安装过老版工具，你需要先卸载它
+# 如果已安装过老版工具，你需要先卸载它
 # npm uninstall vue-cli -g
 
 # 全局安装 @vue/cli 命令行构建工具
@@ -84,7 +84,7 @@ npm i @vue/cli -g
 vue create hello-world
 ```
 
-交互式命令行会提示你选择一些构建特性，你可以根据你的需要来选择，然后脚手架就会帮我们创建好项目的基本骨架了。
+交互式命令行会提示你选择一些构建特性，你可以根据你的需要来选择，然后脚手架就会帮我们创建好项目的基本结构了。
 
 :::tip 提示
 icefox **内置的主题样式是基于 Less 预编译样式语言**的，这里我们推荐你在选择样式预处理器(CSS Pre-processors)时，将 **Less** 选上。
@@ -92,7 +92,7 @@ icefox **内置的主题样式是基于 Less 预编译样式语言**的，这里
 代码风格配置选项里，ESLint + Prettier 的组合还不错。最后将配置文件单独外置，在需要以编程方式进行配置时将会更加便利。
 :::
 
-[这里](https://cli.vuejs.org/zh/guide/creating-a-project.html) 是 vue 官方使用命名行工具创建项目的详细示例，有兴趣的话你也可以过去瞧瞧。
+[这里](https://cli.vuejs.org/zh/guide/creating-a-project.html) 是 vue 官方使用命令行工具创建项目的详细示例，有兴趣的话你也可以过去瞧瞧。
 
 创建好项目后，我们还需要添加下 [ut-builder](https://github.com/utryfe/vue-cli-builder#readme) 插件。
 在安装插件前，推荐你先看一下 vue 官方关于 [命令行工具插件](https://cli.vuejs.org/zh/guide/plugins-and-presets.html) 的说明，
@@ -350,10 +350,10 @@ export default {
 }
 ```
 
-现在我们暂时不需要了解 **main.js** 内容的具体细节，后面我们会有专门的文档来说明。但从代码来看，
-我们可以看出，应用 **插件的安装**，以及 **Router**、**Store**、**App** 的实例化，都是由框架来接管了。
+现在我们暂时不需要了解 **main.js** 内容的具体细节，后面我们会有专门的文档来说明。
+从代码我们可以看出，Vue **插件的安装**，以及 **Router**、**Store**、**App** 的实例化，都是由框架来接管的了。
 
-现在我们还需要更改构建配置文件，并启用路由代码自动生成以及 App 框架能力。这是在 **vue.config.js** 里面配置( `preprocess` )的。
+现在我们还需要更改构建配置文件，并启用代码自动生成以及 App 框架能力。这是在 **vue.config.js** 配置文件里通过 `preprocess` 配置项来声明的。
 下面是个参考：
 
 ```js{3}
@@ -477,3 +477,33 @@ ut-builder 提供了 `3` 种模式来生成路由代码，并完善支持动态�
 
 基于以上了解，我们就可以将示例的 `Home` 组件对应的路由页面重新显示出来了，访问 `/home` 路由即可。
 你也可以修正下示例 `src/App.vue` 文件内的路由链接地址信息。
+
+## 请求与 Mock
+
+我们的应用一般需要与后端服务进行交互，这就要用到远程请求了。icefox 的应用框架（**需启用约定式路由**），基于
+[axios](https://www.npmjs.com/package/axios) 封装了发送 HTTP 请求的能力，且作为一个插件默认被安装进了应用中。
+
+你可以通过以下几种方式来调用请求插件：
+
+```js
+// 在组件中
+this.$http.get('/api/xxx')
+
+// 在非组件中
+Vue.$http.get('/api/xxx')
+
+// 在 Store 的 actions 中
+async someAction({call, dispatch}, payload) {
+  await call('/api/xxx')
+}
+```
+
+:::tip 提示
+请求插件 `$http` 是对 `axios` 的"高阶"扩展封装，因此 `axios` 的所有能力及使用方式，都可以被运用。换言之，如果你熟悉了 `axios` 的使用方式，
+`$http` 就是 `axios` 的"别名"而已。但这并不是简单的引用了下 `axios`，后面我们会有专门的文档说明。如果你对源码感兴趣的话，
+[request](https://github.com/utryfe/icefox/blob/master/lib/plugins/request.js) 插件正是这个封装的实现。
+:::
+
+我们在 `Home.route.vue` 单文件组件里示例下发送请求的操作。
+
+🛠 建设中...
