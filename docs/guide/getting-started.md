@@ -218,7 +218,7 @@ export default {
 
 是不是看起来还不错？实际上底层组件仍旧是 [element-ui](https://element.eleme.cn/#/zh-CN/component/installation)
 的 [Menu](https://element.eleme.cn/#/zh-CN/component/menu) 组件，icefox 对其进行了**高阶封装**，
-扩展了它的能力，也使得它更易于在项目中使用，还为它量身定制了一些主题样式，使得在项目中可以通过 Less 变量来定制一些风格样式。
+扩展了它的能力，也使得它更易于在项目中使用，还为它量身定制了一些主题样式，使得在项目中可以通过 Less 变量来定制一些风格。
 
 如果你想去看一下代码，[AsideMenu](https://github.com/utryfe/icefox/blob/master/lib/components/AsideMenu/AsideMenu.vue) 和
 [Menu](https://github.com/utryfe/icefox/blob/master/lib/components/Menu/ElementMenu.vue) 这两个组件就是上面的实现了。
@@ -478,14 +478,17 @@ ut-builder 提供了 `3` 种模式来生成路由代码，并完善支持动态�
 基于以上了解，我们就可以将示例的 `Home` 组件对应的路由页面重新显示出来了，访问 `/home` 路由即可。
 你也可以修正下示例 `src/App.vue` 文件内的路由链接地址信息。
 
-## 请求与 Mock
+另外你也许会疑惑，基于 icefox 的应用框架，又该怎样引入 store.js 文件呢？这个在进阶的
+[Store 模块化](./store-module.md) 里面，我们会有专门的讲解。
+
+## 接口请求与 Mock
 
 我们的应用一般需要与后端服务进行交互，这就要用到远程请求了。icefox 的应用框架（**需启用约定式路由**），基于
 [axios](https://www.npmjs.com/package/axios) 封装了发送 HTTP 请求的能力，且作为一个插件默认被安装进了应用中。
 
 你可以通过以下几种方式来调用请求插件：
 
-```js
+```js{}
 // 在组件中
 this.$http.get('/api/xxx')
 
@@ -500,10 +503,132 @@ async someAction({call, dispatch}, payload) {
 
 :::tip 提示
 请求插件 `$http` 是对 `axios` 的"高阶"扩展封装，因此 `axios` 的所有能力及使用方式，都可以被运用。换言之，如果你熟悉了 `axios` 的使用方式，
-`$http` 就是 `axios` 的"别名"而已。但这并不是简单的引用了下 `axios`，后面我们会有专门的文档说明。如果你对源码感兴趣的话，
+`$http` 就是 `axios` 的"别名"而已。但这并不是简单的引用，后面我们会有专门的文档说明。如果你对源码感兴趣的话，
 [request](https://github.com/utryfe/icefox/blob/master/lib/plugins/request.js) 插件正是这个封装的实现。
 :::
 
-我们在 `Home.route.vue` 单文件组件里示例下发送请求的操作。
+我们在示例项目的 `Home.route.vue` 单文件组件里演示下发送请求的操作。这里我们模拟一个获取用户姓名并在页面上显示问候语的场景。
+先来作一些小的修改，添加一点请求服务端接口的逻辑：
+
+```vue{4,16,17,18,19,20,22,23,24,25,26,27}
+<template>
+  <div class="home">
+    <img alt="Vue logo" src="../assets/logo.png" />
+    <HelloWorld :msg="msg" />
+  </div>
+</template>
+
+<script>
+// @ is an alias to /src
+import HelloWorld from '@/components/HelloWorld.vue'
+
+export default {
+  name: 'Home',
+  components: { HelloWorld },
+
+  data() {
+    return {
+      msg: 'Welcome!',
+    }
+  },
+
+  async created() {
+    // 发送请求，加载用户信息
+    const user = await this.$http.get(`{baseUrl}/api/user/info`).data
+    // 更新并显示问候语
+    this.msg = `${user.name}, Welcome!`
+  },
+}
+</script>
+```
+
+:::tip 提示
+我们在示例代码里面应用了 [async/await](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/async_function) 语法。
+另外，在编写异步请求代码时，推荐大家都采用这种语法形式。
+:::
+
+访问 `/home` 路由页面（以下均同），打开浏览器（**Chrome**）的开发者工具，切换至 `Network` 面板，我们可以看到地址为 `/api/user/info` 的请求已经被浏览器发送了。
+因为没有合适的服务端接口，这里我们会看到一个状态码为 `404` 的请求响应。
+
+也许你已经注意到了示例代码中的请求地址 `{baseUrl}/api/user/info`，其中包含一个 `{baseUrl}` 的占位变量（**注意占位变量前面并没有 ES6 模板字符串的 `$` 引导符号**）。
+我们可以声明下这个占位变量的值。
+
+如果你还记得前面 `main.js` 示例代码的话，里面就有这个变量的声明，它是在内置的 HTTP 请求插件的配置对象属性 `baseParams` 里定义的。
+
+:::tip 提示
+变量名 `baseUrl` 只是示例需要而已（注意区别 `axios` 配置参数 `baseURL` ），你可以定义成任何你喜欢的名称。实际上 `baseParams` 是插件在 `axios` 配置的基础上扩展出的配置项，
+它提供了一种便捷的方式来使用一些与请求相关的常量或参数值。你可以在请求地址里面方便的嵌入这些常量或参数值，而不需要频繁地在组件中通过模块导入的形式来引入这些值。
+:::
+
+我们可以给这个 `baseUrl` 赋上远程服务器地址的值，例如：`10.0.2.68:8088` 。再次查看接口请求信息，你会发现请求服务器地址已经变更为刚刚配置的地址值。
+
+为了模拟服务端接口响应，我们接下来启用构建工具提供的接口 **Mock 与代理** 能力。启用方式也很便捷，在 `vue.config.js`
+配置文件的插件配置项里，声明 `mock` 服务配置即可。下面是个参考：
+
+```js{8,9,10}
+module.exports = {
+  pluginOptions: {
+    preprocess: {
+      appNestedRoutes: 'auto',
+    },
+
+    // 构建服务配置
+    services: {
+      mock: true, // 启用mock服务
+    },
+  },
+}
+```
+
+:::warning 提示
+插件配置项名 `services` 需要 `vue-cli-plugin-ut-builder` 版本在 `2.1.4` 以上。`低于 2.1.4` 的版本，请使用 `service` 。
+:::
+
+更新 `vue.config.js` 配置文件，手动重启构建服务，等待构建完成后，刷新页面继续查看接口 `/api/user/info` 的网络请求，你会发现请求服务器地址已经变更为本机地址。
+
+查看示例项目的根目录，可以看到有一个新的文件夹被自动创建了，其目录文件结构如下：
+
+```{3}
+mock
+├── api
+│   └── user.js
+├── mock.data.json
+└── mock.demo.js
+```
+
+打开 `api/user.js` 文件，我们可以看到，构建工具早已帮我们创建好了接口响应声明（ `GET /api/user/info` ）。
+因为后面会有专门的文档来讲解 Mock 模块的使用，这里我们先返回一些数据，好让页面能够正确获取到用户信息。下面是个参考：
+
+```js{4,8,9,10}
+import Mock from 'mockjs'
+
+export const delay = 0
+export const disabled = false
+
+export default {
+  // 接口响应定义
+  'GET /api/user/info': (req, res, next) => {
+    return Mock.mock({ name: '@cname(2, 4)' })
+  },
+}
+```
+
+:::warning 提示
+默认参数设定下，自动生成的 mock 模块中，`disabled` 变量的值是为 `false` 的。你需要将其改为 `true`，才会使得该 mock 模块生效。
+另外，这些默认设定也可以通过 mock 构建服务的配置参数来变更。如果启用了应用框架能力，mock 能力也会根据不同的构建模式与应用无缝衔接。
+:::
+
+刷新页面试试，是不是已经能够看到页面上带称谓的问候语了？
+接下来你也可以尝试下禁用 mock，或者更改接口响应返回值，看看网页上的接口请求及响应会发生怎样的变化。
+
+:::tip 提示
+**Mock** 能力是 **ut-builder** 的强大特性之一。支持自动代理无缝衔接应用，可根据接口请求信息自动生成 mock 模块文件并定位至代码行，
+以及根据远程接口数据自动生成 [MockJS](http://mockjs.com/) 随机数据生成代码。mock 模块文件可使用 es6 语法，支持实时转译更新。
+可设置延时响应时长，也支持模块以及模块内单个接口的本地与远程响应实时切换。
+另外，对于 `WebSocket` 的模拟，也提供了与构建无缝衔接的精美网页客户端应用，可手动或自动模拟 `socket` 推送数据，
+并支持常见的浏览器端 `websocket` 协议实现（`websocket`、`sockjs`、`socket.io`、`STOMP`）。
+:::
+
+## 发布预览与部署
 
 🛠 建设中...
