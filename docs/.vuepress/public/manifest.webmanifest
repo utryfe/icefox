@@ -1,0 +1,20 @@
+{
+  "name": "icefox",
+  "short_name": "icefox",
+  "start_url": ".",
+  "display": "browser",
+  "background_color": "#fff",
+  "description": "A app library for vue.",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "320x320",
+      "type": "image/png"
+    }
+  ]
+}

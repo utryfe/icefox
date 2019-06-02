@@ -48,6 +48,16 @@ declare module 'vue-router/types/router' {
   }
 }
 
+interface AxiosPromise<T = any> {
+  readonly data: Promise<T>
+  readonly status: Promise<T>
+  readonly statusText: Promise<T>
+  readonly headers: Promise<T>
+  readonly config: Promise<T>
+  readonly request: Promise<T>
+  readonly message: Promise<T>
+}
+
 declare module 'vue/types/vue' {
   interface Vue {
     /**

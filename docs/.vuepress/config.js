@@ -14,6 +14,8 @@ module.exports = {
       },
     },
   },
+  serviceWorker: true,
+  // 下面配置菜单，导航等
   themeConfig: {
     nav: [
       { text: '指南', link: '/guide/introduce' },

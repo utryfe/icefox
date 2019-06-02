@@ -1,6 +1,12 @@
 <template>
   <article class="ice-basic-layout">
-    <ice-layout class="ice-layout-body" :split="split" v-bind="$attrs" v-on="$listeners">
+    <ice-layout
+      class="ice-layout-body"
+      :split="split"
+      :horizontal="horizontal"
+      v-bind="$attrs"
+      v-on="$listeners"
+    >
       <template v-if="split">
         <slot name="left" slot="left" />
         <slot name="right" slot="right" />
@@ -22,7 +28,15 @@ export default {
   inheritAttrs: false,
 
   props: {
+    /**
+     * 分割区域（两部分）
+     */
     split: Boolean,
+
+    /**
+     * 使用水平方向的布局
+     */
+    horizontal: Boolean,
   },
 
   provide() {
