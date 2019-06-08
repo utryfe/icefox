@@ -38,7 +38,7 @@ export default {
     /**
      * 点击时切换至指定的路由路径。默认切换至根路由。
      */
-    clickToRoute: {
+    route: {
       type: [Boolean, String, Object],
       default: '/',
     },
@@ -61,13 +61,13 @@ export default {
 
   computed: {
     className() {
-      const { titleHidden, transition, clickToRoute } = this
+      const { titleHidden, transition, route } = this
       return [
         'ice-logo-panel',
         {
           'ice-collapsed': titleHidden,
           'ice-transition-none': !transition,
-          'ice-cursor-pointer': !!clickToRoute,
+          'ice-cursor-pointer': !!route,
         },
       ]
     },
@@ -99,10 +99,10 @@ export default {
     },
 
     onClick() {
-      const { clickToRoute, $router } = this
-      const type = typeof clickToRoute
-      if (clickToRoute && $router && (type === 'string' || type === 'object')) {
-        $router.push(clickToRoute)
+      const { route, $router } = this
+      const type = typeof route
+      if (route && $router && (type === 'string' || type === 'object')) {
+        $router.push(route)
       }
     },
   },

@@ -21,7 +21,7 @@ import { IceSvgIcon } from './components/svg-icon'
 import { IceLogoPanel } from './components/logo-panel'
 import { IceSplitPanes } from './components/split-panes'
 import { IceAsideMenu } from './components/menu'
-import { IceRouterTabs } from './components/router-tabs'
+import { IceTabsView } from './components/tabs-view'
 
 export { IceMenu } from './components/menu'
 export class BasicLayout extends IceBasicLayout {}
@@ -36,4 +36,4 @@ export class SvgIcon extends IceSvgIcon {}
 export class LogoPanel extends IceLogoPanel {}
 export class SplitPanes extends IceSplitPanes {}
 export class AsideMenu extends IceAsideMenu {}
-export class RouterTabs extends IceRouterTabs {}
+export class RouterTabs extends IceTabsView {}

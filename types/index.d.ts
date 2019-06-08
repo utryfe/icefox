@@ -3,6 +3,7 @@ import VueRouter, { RouteRecord } from 'vue-router'
 import { Store } from 'vuex'
 import { AxiosStatic } from 'axios'
 import * as IceFox from './ice-ui'
+
 export * from './ice-ui'
 
 interface DebugStatic {
@@ -56,6 +57,28 @@ interface AxiosPromise<T = any> {
   readonly config: Promise<T>
   readonly request: Promise<T>
   readonly message: Promise<T>
+}
+
+declare module 'vue/types/options' {
+  interface ComponentOptions<V extends Vue> {
+    /**
+     * 路由组件的标题（document title、tabs label）
+     */
+    title?: string
+
+    /**
+     * 路由重定向声明
+     */
+    redirect?:
+      | string
+      | RouteRecord
+      | ((to: RouteRecord, from: RouteRecord) => string | RouteRecord)
+
+    /**
+     * 不缓存该路由组件实例
+     */
+    nocache?: boolean
+  }
 }
 
 declare module 'vue/types/vue' {

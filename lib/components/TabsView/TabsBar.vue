@@ -2,7 +2,7 @@
   <element-tabs
     class="ice-element-tabs"
     tab-position="top"
-    :type="type"
+    :type="tabType"
     :closable="closable && routes.length > minTabsCount"
     v-bind="$attrs"
     v-on="$listeners"
@@ -15,7 +15,7 @@
       v-bind="getTabPaneProps(route)"
     >
       <tab-label
-        class="ice-router-tabs-label"
+        class="ice-tabs-view-label"
         slot="label"
         :route="route"
         :prop="labelProp"
@@ -31,7 +31,7 @@ import { getDefaultRouteComponent } from '../../utils/route'
 import { toCamelCaseProps } from '../../utils/vnode'
 
 export default {
-  name: 'TabsView',
+  name: 'TabsBar',
   inheritAttrs: false,
   components: { ElementTabs: Tabs, ElementTabPane: TabPane, TabLabel },
 
@@ -46,10 +46,7 @@ export default {
       default: true,
     },
 
-    type: {
-      type: String,
-      default: 'card',
-    },
+    fixedCloseButton: Boolean,
 
     labelProp: {
       type: [String, Function],
@@ -61,13 +58,14 @@ export default {
       default: null,
     },
 
-    /**
-     * 最小保留的页签数。达到最小个数时页签将不可被关闭。
-     */
-    minTabsCount: {
-      type: Number,
-      default: 1,
-    },
+    minTabsCount: Number,
+  },
+
+  data() {
+    const { fixedCloseButton } = this
+    return {
+      tabType: fixedCloseButton ? 'border-card' : 'card',
+    }
   },
 
   methods: {
@@ -84,13 +82,47 @@ export default {
 </script>
 
 <style lang="less">
-.ice-router-tabs > .ice-router-tabs-bar {
+@import '../../theme/var.less';
+
+.ice-tabs-view > .ice-tabs-view-bar {
   & > .ice-element-tabs {
-    .el-tabs__header {
-      margin-bottom: 0;
+    box-shadow: none;
+    border: 1px none @layout-tabs-bar-border-color;
+    border-top-style: solid;
+
+    & > .el-tabs__header {
+      margin: 0;
+      background-color: @layout-tabs-bar-background-color;
+
+      .el-tabs__nav {
+        border-radius: 0;
+        border: 0;
+      }
+
+      .el-tabs__item {
+        border: 1px solid transparent;
+        margin-top: -1px;
+        color: @layout-tabs-tab-item-color;
+
+        & + .el-tabs__item {
+          margin-left: -1px;
+        }
+
+        &:not(.is-disabled):hover {
+          color: @layout-tabs-tab-item-hover-color;
+        }
+
+        &.is-active {
+          color: @layout-tabs-tab-item-active-color;
+          background-color: @layout-tabs-tab-item-active-background-color;
+          border-right-color: @layout-tabs-bar-border-color;
+          border-left-color: @layout-tabs-bar-border-color;
+        }
+      }
     }
 
-    &-label {
+    & > .el-tabs__content {
+      display: none;
     }
   }
 }

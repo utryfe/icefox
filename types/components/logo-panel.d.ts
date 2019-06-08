@@ -31,5 +31,5 @@ export declare class IceLogoPanel extends IceComponent {
   /**
    * 点击时切换至指定的路由路径。默认切换至根路由。
    */
-  clickToRoute: boolean | string | object
+  route: boolean | string | object
 }

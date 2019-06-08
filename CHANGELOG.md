@@ -1,5 +1,24 @@
 ## 更新日志
 
+### 1.1.4
+
+_2019-06-16_
+
+#### 新特性
+
+- 新增 `BreadcrumbView` 组件。
+- 新增 `IceRouterView` 组件。
+- 路由支持切换进度条，支持定义组件时声明重定向路由。
+
+#### 优化
+
+- 优化路由视图逻辑。
+
+#### 非兼容性更新
+
+- `LogoPanel` 的属性 `clickToRoute` 变更为 `route`。
+- `RouterTabs` 组件更名为 `TabsView`。
+
 ### 1.1.3
 
 _2019-06-08_
@@ -10,7 +29,7 @@ _2019-06-08_
 - `RouterTabs` 增加 `transition` 等属性，可定义路由切换时的过渡动效。
 - `RouterTabs` 增加 `keep-alive` 属性，可选择是否开启缓存支持（默认开启）。
 - 定义路由组件时，可声明 `noCache` 属性，意即不缓存该组件的实例（keep-alive）。
-- `LogoPanel` 增加 `clickToRoute` 属性，可自定义点击时需切换的路由地址。
+- `LgoPanel` 增加 ~~clickToRoute~~ 属性，可自定义点击时需切换的路由地址。
 
 #### 优化
 

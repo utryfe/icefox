@@ -96,6 +96,7 @@ export default {
   data() {
     const { visible, width, collapsed, fixed } = this
     return {
+      pageScrollLeft: document.documentElement.scrollLeft,
       resizing: false,
       resizeWidth: width,
       inheritWidth: false,
@@ -142,25 +143,29 @@ export default {
     },
 
     mainStyle() {
-      const { collapsedWidth, inheritWidth, style, state } = this
+      const { collapsedWidth, inheritWidth, style, state, pageScrollLeft } = this
       const { collapsed, visible, fixed } = state
+      let mainStyle
       if (collapsed) {
-        return {
+        mainStyle = {
           width: fixed || !visible ? collapsedWidth : '',
           minWidth: '0px',
           maxWidth: style.maxWidth,
         }
-      }
-      if (fixed || !visible) {
-        return style
-      }
-      if (inheritWidth) {
-        return {
+      } else if (fixed || !visible) {
+        mainStyle = { ...style }
+      } else if (inheritWidth) {
+        mainStyle = {
           ...style,
           width: fixed ? style.width : '',
         }
+      } else {
+        mainStyle = {}
       }
-      return {}
+      if (fixed) {
+        mainStyle.left = `-${pageScrollLeft}px`
+      }
+      return mainStyle
     },
 
     rootStyle() {
@@ -222,8 +227,16 @@ export default {
       this.state.fixed = !!val
     },
 
-    'state.fixed'(val) {
-      this.$emit('update:fixed', !!val)
+    'state.fixed': {
+      immediate: true,
+      handler(val) {
+        this.$emit('update:fixed', !!val)
+        if (val) {
+          this.registerWindowEvent()
+        } else {
+          this.unregisterWindowEvent()
+        }
+      },
     },
 
     rootStyle: {
@@ -261,6 +274,7 @@ export default {
   },
 
   mounted() {
+    this.handlePageScroll()
     const { $basicLayout, state, useTransition } = this
     if ($basicLayout) {
       $basicLayout.$emit(
@@ -272,6 +286,7 @@ export default {
   },
 
   beforeDestroy() {
+    this.unregisterWindowEvent()
     const { $basicLayout } = this
     if ($basicLayout) {
       $basicLayout.$off('aside-state-change', this.updateState)
@@ -346,6 +361,21 @@ export default {
         this.inheritWidth = true
         this.resizeWidth = styles.width
       }
+    },
+
+    handlePageScroll() {
+      this.pageScrollLeft = document.documentElement.scrollLeft
+    },
+
+    registerWindowEvent() {
+      this.handlePageScroll()
+      window.addEventListener('resize', this.handlePageScroll, false)
+      window.addEventListener('scroll', this.handlePageScroll, false)
+    },
+
+    unregisterWindowEvent() {
+      window.removeEventListener('resize', this.handlePageScroll, false)
+      window.removeEventListener('scroll', this.handlePageScroll, false)
     },
   },
 }

@@ -10,7 +10,7 @@ type LabelPropHandler = (
 
 type PropsHandler = (route: RouteRecord, component: Component) => object
 
-export declare class IceRouterTabs extends Tabs {
+export declare class IceTabsView extends Tabs {
   $listeners: {
     /**
      * 路由视图状态改变时的回调
@@ -36,7 +36,7 @@ export declare class IceRouterTabs extends Tabs {
   /**
    * 面板样式名
    */
-  tabPaneClass?: string | string[] | object | PropsHandler
+  viewClass?: string | string[] | object | PropsHandler
 
   /**
    * 面板属性

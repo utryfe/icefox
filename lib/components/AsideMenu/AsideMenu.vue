@@ -188,10 +188,11 @@ export default {
 
       if (!activeIndex && this.matchSubRoute) {
         // 匹配激活子路由路径
+        const caseSensitive = isRouteCaseSensitive()
         activeIndex = this.getMatchedRouteIndex(menuRoutes, (routePath) => {
           const reg = new RegExp(
             `^${escapeRegExp(trimPathTrailingSlash(routePath))}(?:/[^/]+?)+(?:/(?=$))?$`,
-            isRouteCaseSensitive() ? '' : 'i'
+            caseSensitive ? '' : 'i'
           )
           return reg.test(path)
         })

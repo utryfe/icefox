@@ -51,7 +51,7 @@ export default {
 
     viewClassName() {
       const { viewClass } = this
-      return [viewClass, 'scroll-view-class']
+      return [viewClass, 'ice-scroll-view']
     },
   },
 
@@ -108,7 +108,7 @@ export default {
       overflow-y: visible;
     }
 
-    & > .scroll-view-class {
+    & > .ice-scroll-view {
       height: 100%;
       overflow: visible;
       padding: 0.1px 0 0 0;

@@ -51,10 +51,16 @@ export default {
     return createElement(
       'span',
       {
-        props: {},
+        class: 'ice-tabs-label',
       },
       getTabLabelVNodes(createElement, prop, route)
     )
   },
 }
 </script>
+
+<style lang="less">
+.ice-tabs-label {
+  font-weight: normal;
+}
+</style>
