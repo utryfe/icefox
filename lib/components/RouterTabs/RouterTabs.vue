@@ -1,9 +1,10 @@
 <template>
   <div class="ice-router-tabs">
     <div class="ice-router-tabs-bar">
-      <slot name="tabs" :routes="routes" :active="active">
+      <slot name="tabs" :routes="scopedRoutes" :active="active">
         <tabs-bar
           :routes="routes"
+          :label-prop="labelProp"
           v-model="active"
           v-bind="$attrs"
           v-on="$listeners"
@@ -17,6 +18,10 @@
         ref="aliveView"
         :class="viewClassName"
         :routes="routes"
+        :enable-alive="keepAlive"
+        :transition="transition"
+        @after-route-enter="handleRouterEnter"
+        @after-route-leave="handleRouterLeave"
         v-model="active"
         v-bind="aliveProps"
       />
@@ -28,7 +33,7 @@
 import AliveView from './AliveView'
 import TabsBar from './TabsBar'
 import { mergeClass, toCamelCaseProps } from '../../utils/vnode'
-import { getDefaultRouteComponent } from '../../utils/route'
+import { getDefaultRouteComponent, getRouteComponentTitle } from '../../utils/route'
 
 export default {
   name: 'IceRouterTabs',
@@ -41,12 +46,22 @@ export default {
       default: '',
     },
 
+    keepAlive: {
+      type: Boolean,
+      default: true,
+    },
+
     keepAliveProps: {
       type: [Object, Function],
       default: null,
     },
 
-    transition: Boolean,
+    labelProp: {
+      type: [String, Function],
+      default: 'title',
+    },
+
+    transition: [Boolean, String],
   },
 
   data() {
@@ -78,11 +93,38 @@ export default {
     activeComponent() {
       return getDefaultRouteComponent(this.$route)
     },
+
+    scopedRoutes() {
+      const { routes, labelProp } = this
+      return routes.map((route) => ({
+        ...route,
+        title: getRouteComponentTitle(route, labelProp),
+      }))
+    },
+
+    currentRouterState() {
+      const { scopedRoutes, active } = this
+      return { routes: [...scopedRoutes], active }
+    },
+  },
+
+  watch: {
+    currentRouterState() {
+      this.$emit('change', this.currentRouterState)
+    },
   },
 
   methods: {
     handleTabRemove(path) {
       this.$refs.aliveView.removeRouteView(path)
+    },
+
+    handleRouterEnter() {
+      this.$emit('after-route-enter')
+    },
+
+    handleRouterLeave() {
+      this.$emit('after-route-leave')
     },
   },
 }

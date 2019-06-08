@@ -32,6 +32,12 @@ export default {
     },
   },
 
+  data() {
+    return {
+      $timer: -1,
+    }
+  },
+
   computed: {
     wrapperClass() {
       const { overflowX, overflowY, wrapClass } = this
@@ -50,10 +56,21 @@ export default {
   },
 
   mounted() {
-    const { scrollbar } = this.$refs
-    if (scrollbar && typeof scrollbar.update === 'function') {
-      scrollbar.update()
-    }
+    this.update()
+  },
+
+  beforeDestroy() {
+    clearTimeout(this.$timer)
+  },
+
+  methods: {
+    update() {
+      const { scrollbar } = this.$refs
+      if (scrollbar && typeof scrollbar.update === 'function') {
+        clearTimeout(this.$timer)
+        this.$timer = setTimeout(() => scrollbar.update(), 200)
+      }
+    },
   },
 }
 </script>

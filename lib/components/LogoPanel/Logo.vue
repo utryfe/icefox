@@ -1,5 +1,5 @@
 <template>
-  <div :class="className">
+  <div :class="className" @click="onClick">
     <div class="content">
       <div class="logo">
         <slot name="logo">
@@ -25,8 +25,23 @@
 export default {
   name: 'IceLogoPanel',
   props: {
+    /**
+     * 注意！该选项值只能为远程URL地址。
+     */
     src: String,
+
+    /**
+     * logo标题，或系统名称。
+     */
     title: String,
+
+    /**
+     * 点击时切换至指定的路由路径。默认切换至根路由。
+     */
+    clickToRoute: {
+      type: [Boolean, String, Object],
+      default: '/',
+    },
   },
 
   inject: {
@@ -46,12 +61,13 @@ export default {
 
   computed: {
     className() {
-      const { titleHidden, transition } = this
+      const { titleHidden, transition, clickToRoute } = this
       return [
         'ice-logo-panel',
         {
           'ice-collapsed': titleHidden,
           'ice-transition-none': !transition,
+          'ice-cursor-pointer': !!clickToRoute,
         },
       ]
     },
@@ -81,6 +97,14 @@ export default {
         }
       }
     },
+
+    onClick() {
+      const { clickToRoute, $router } = this
+      const type = typeof clickToRoute
+      if (clickToRoute && $router && (type === 'string' || type === 'object')) {
+        $router.push(clickToRoute)
+      }
+    },
   },
 }
 </script>
@@ -105,6 +129,10 @@ export default {
   flex: none;
   order: -1;
   padding: 0 @logo-panel-padding;
+}
+
+.ice-cursor-pointer {
+  cursor: pointer;
 }
 
 .content {

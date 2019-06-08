@@ -1,13 +1,22 @@
 <template>
-  <keep-alive :include="aliveInclude" v-bind="$attrs">
-    <router-view />
-  </keep-alive>
+  <transition
+    mode="out-in"
+    :name="transitionName"
+    @after-enter="afterRouteTransitionEnter"
+    @after-leave="afterRouteTransitionLeave"
+  >
+    <keep-alive v-if="enableAlive" :include="aliveInclude" v-bind="$attrs">
+      <router-view />
+    </keep-alive>
+    <router-view v-else />
+  </transition>
 </template>
 
 <script>
 import { escapeRegExp } from '../../utils/mixed'
 import {
   getDefaultRouteComponent,
+  isRouteCaseSensitive,
   isSameRoute,
   trimPathTrailingSlash,
 } from '../../utils/route'
@@ -16,6 +25,10 @@ export default {
   name: 'AliveView',
   inheritAttrs: false,
   props: {
+    enableAlive: Boolean,
+
+    transition: [Boolean, String],
+
     include: [String, RegExp, Array],
 
     routes: {
@@ -27,14 +40,6 @@ export default {
       type: String,
       default: '/',
     },
-  },
-
-  data() {
-    const { routes } = this
-    return {
-      routeViews: Array.isArray(routes) ? routes : [],
-      active: this.value,
-    }
   },
 
   provide() {
@@ -50,7 +55,33 @@ export default {
     }
   },
 
+  inject: {
+    $basicLayout: {
+      from: '$basicLayout',
+      default: null,
+    },
+  },
+
+  data() {
+    const { routes } = this
+    return {
+      routeViews: Array.isArray(routes) ? routes : [],
+      active: this.value,
+    }
+  },
+
   computed: {
+    transitionName() {
+      const { transition } = this
+      if (!transition) {
+        return ''
+      }
+      if (typeof transition === 'string') {
+        return transition
+      }
+      return 'route-transition'
+    },
+
     aliveInclude() {
       const { include } = this
       return this.getKeepAliveInclude(include)
@@ -81,7 +112,27 @@ export default {
     },
   },
 
+  mounted() {
+    this.updateRouteViews(this.$route)
+  },
+
   methods: {
+    afterRouteTransitionEnter() {
+      const { $basicLayout } = this
+      this.$emit('after-route-enter')
+      if ($basicLayout) {
+        $basicLayout.$emit('after-route-enter')
+      }
+    },
+
+    afterRouteTransitionLeave() {
+      const { $basicLayout } = this
+      this.$emit('after-route-leave')
+      if ($basicLayout) {
+        $basicLayout.$emit('after-route-leave')
+      }
+    },
+
     // 清除路由视图
     removeRouteView(path) {
       let { routeViews, active } = this
@@ -122,6 +173,10 @@ export default {
 
     // 更新路由视图
     updateRouteViews(to) {
+      if (!to) {
+        return
+      }
+
       if (this.routingStatus) {
         //
         this.active = ''
@@ -145,8 +200,7 @@ export default {
 
       let path = trimPathTrailingSlash(to.path)
       // 路由路径大小写敏感可通过路由初始化参数确定
-      const { caseSensitive } = Object.assign({}, this.$router.options)
-      if (!caseSensitive) {
+      if (!isRouteCaseSensitive()) {
         path = path.toLowerCase()
       }
 
@@ -167,7 +221,14 @@ export default {
     // 用于控制组件缓存
     getKeepAliveInclude(userInclude) {
       const { routeViews } = this
-      const aliveNames = routeViews.map((view) => view.aliveName)
+      const aliveNames = routeViews
+        .filter((view) => {
+          const component = getDefaultRouteComponent(view)
+          // 如果组件定义包含 noCache 或 nocache 声明，则该组件不作缓存处理
+          return component ? !(component['noCache'] || component['nocache']) : false
+        })
+        .map((view) => view.aliveName)
+
       let include
 
       // 在使用约定式目录路由时，router模块会保证路由组件都有独立的名称
@@ -219,3 +280,25 @@ export default {
   },
 }
 </script>
+
+<style lang="less" scoped>
+@import '../../theme/var.less';
+
+.route-transition {
+  &-leave-active,
+  &-enter-active {
+    transition: opacity @layout-route-transition-duration,
+      transform @layout-route-transition-duration;
+  }
+
+  &-enter {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  &-leave-to {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+}
+</style>

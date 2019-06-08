@@ -18,8 +18,13 @@
 
 <script>
 import ElementMenu from '../Menu/ElementMenu'
+import { escapeRegExp } from '../../utils/mixed'
 import { mergeClass } from '../../utils/vnode'
-import { isSameRoute } from '../../utils/route'
+import {
+  isRouteCaseSensitive,
+  isSameRoute,
+  trimPathTrailingSlash,
+} from '../../utils/route'
 
 export default {
   name: 'IceAsideMenu',
@@ -61,6 +66,14 @@ export default {
       type: Boolean,
       default: true,
     },
+
+    /**
+     * 启用路由模式时，当无法精确匹配到当前激活路由的路径时，是否执行子路由路径匹配
+     */
+    matchSubRoute: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   inject: {
@@ -73,6 +86,7 @@ export default {
   data() {
     return {
       menuCollapsed: !!this.collapse,
+      currentActive: '',
     }
   },
 
@@ -94,25 +108,11 @@ export default {
         'ice-transition-none': !collapseTransition,
       })
     },
-
-    currentActive() {
-      const { defaultActive, router, $route } = this
-      let activeIndex
-      if (router && $route !== null && typeof $route === 'object') {
-        activeIndex = this.getActiveIndexByRoute($route)
-      }
-      if (!activeIndex) {
-        activeIndex = defaultActive
-      }
-
-      if (['string', 'number'].includes(typeof activeIndex)) {
-        return `${activeIndex}`
-      }
-      return ''
-    },
   },
 
   watch: {
+    $route: 'refreshActiveIndex',
+
     collapse(collapsed) {
       this.menuCollapsed = !!collapsed
     },
@@ -140,7 +140,30 @@ export default {
     }
   },
 
+  mounted() {
+    this.refreshActiveIndex()
+  },
+
   methods: {
+    refreshActiveIndex() {
+      const { defaultActive, router, $route } = this
+      let activeIndex
+      if (router && $route !== null && typeof $route === 'object') {
+        activeIndex = this.getActiveIndexByRoute($route)
+      }
+      if (!activeIndex) {
+        activeIndex = defaultActive
+      }
+
+      if (['string', 'number'].includes(typeof activeIndex)) {
+        activeIndex = `${activeIndex}`
+      } else {
+        activeIndex = ''
+      }
+
+      this.currentActive = activeIndex
+    },
+
     updateCollapse(state) {
       const { collapsed } = Object.assign({}, state)
       if (typeof collapsed === 'boolean') {
@@ -158,9 +181,29 @@ export default {
       if (!menuItemsStore) {
         return ''
       }
+      const menuRoutes = Object.entries(menuItemsStore)
 
+      // 精确匹配激活路由路径
+      let activeIndex = this.getMatchedRouteIndex(menuRoutes, isSameRoute, path)
+
+      if (!activeIndex && this.matchSubRoute) {
+        // 匹配激活子路由路径
+        activeIndex = this.getMatchedRouteIndex(menuRoutes, (routePath) => {
+          const reg = new RegExp(
+            `^${escapeRegExp(trimPathTrailingSlash(routePath))}(?:/[^/]+?)+(?:/(?=$))?$`,
+            isRouteCaseSensitive() ? '' : 'i'
+          )
+          return reg.test(path)
+        })
+      }
+
+      return activeIndex
+    },
+
+    getMatchedRouteIndex(routes, matcher, currentPath) {
+      // 精确匹配激活路由路径
       const routeTypes = ['string', 'object']
-      for (const [index, { route }] of Object.entries(menuItemsStore)) {
+      for (const [path, { route }] of routes) {
         let type
         let routePath
         if (route && routeTypes.includes((type = typeof route))) {
@@ -171,16 +214,15 @@ export default {
           }
         }
         if (!routePath) {
-          routePath = index
+          routePath = path
         }
         if (!routePath.startsWith('/')) {
           routePath = `/${routePath}`
         }
-        if (isSameRoute(routePath, path)) {
-          return index
+        if (matcher(routePath, currentPath)) {
+          return path
         }
       }
-
       return ''
     },
   },

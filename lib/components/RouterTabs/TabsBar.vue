@@ -3,7 +3,7 @@
     class="ice-element-tabs"
     tab-position="top"
     :type="type"
-    :closable="closable"
+    :closable="closable && routes.length > minTabsCount"
     v-bind="$attrs"
     v-on="$listeners"
   >
@@ -59,6 +59,14 @@ export default {
     tabPaneProps: {
       type: [Object, Function],
       default: null,
+    },
+
+    /**
+     * 最小保留的页签数。达到最小个数时页签将不可被关闭。
+     */
+    minTabsCount: {
+      type: Number,
+      default: 1,
     },
   },
 

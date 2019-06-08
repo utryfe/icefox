@@ -145,4 +145,9 @@ export declare class IceMenu extends Menu {
   collapseTransition: boolean
 }
 
-export declare class IceAsideMenu extends IceMenu {}
+export declare class IceAsideMenu extends IceMenu {
+  /**
+   * 启用路由模式时，当无法精确匹配到当前激活路由的路径时，是否执行子路由路径匹配
+   */
+  matchSubRoute: boolean
+}
