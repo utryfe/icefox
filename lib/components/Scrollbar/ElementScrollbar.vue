@@ -57,10 +57,12 @@ export default {
 
   mounted() {
     this.update()
+    window.addEventListener('resize', this.update, false)
   },
 
   beforeDestroy() {
     clearTimeout(this.$timer)
+    window.removeEventListener('resize', this.update, false)
   },
 
   methods: {
@@ -68,7 +70,7 @@ export default {
       const { scrollbar } = this.$refs
       if (scrollbar && typeof scrollbar.update === 'function') {
         clearTimeout(this.$timer)
-        this.$timer = setTimeout(() => scrollbar.update(), 200)
+        this.$timer = setTimeout(() => this.$nextTick(scrollbar.update), 200)
       }
     },
   },
@@ -80,6 +82,15 @@ export default {
 
 .ice-scrollbar {
   & > .el-scrollbar__bar {
+    & > .el-scrollbar__thumb {
+      background-color: @scrollbar-background-color;
+      opacity: @scrollbar-opacity;
+
+      &:hover {
+        background-color: @scrollbar-hover-background-color;
+      }
+    }
+
     &.is-vertical {
       right: @scrollbar-gap;
       width: @scrollbar-width;
@@ -92,6 +103,10 @@ export default {
   }
 
   & > .ice-scroll-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: none;
+
     &.ice-scroll-overflow-x-hidden {
       overflow-x: hidden;
     }
@@ -109,7 +124,7 @@ export default {
     }
 
     & > .ice-scroll-view {
-      height: 100%;
+      flex: 1 1 auto;
       overflow: visible;
       padding: 0.1px 0 0 0;
       margin: -0.1px 0 0 0;

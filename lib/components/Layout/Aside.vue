@@ -1,5 +1,5 @@
 <template>
-  <aside :class="className" :style="rootStyle">
+  <aside ref="container" :class="className" :style="rootStyle">
     <div class="aside-main" :style="mainStyle">
       <div class="aside-header">
         <slot name="header" />
@@ -29,6 +29,7 @@
 <script>
 import ElementScrollbar from '../Scrollbar'
 import AsideTrigger from '../AsideTrigger'
+import { addResizeListener, removeResizeListener } from '../../utils/dom'
 
 export default {
   name: 'IceLayoutAside',
@@ -99,6 +100,7 @@ export default {
       pageScrollLeft: document.documentElement.scrollLeft,
       resizing: false,
       resizeWidth: width,
+      offsetWidth: typeof width === 'string' && width.endsWith('px') ? width : 0,
       inheritWidth: false,
       justify: false,
       state: {
@@ -143,7 +145,14 @@ export default {
     },
 
     mainStyle() {
-      const { collapsedWidth, inheritWidth, style, state, pageScrollLeft } = this
+      const {
+        collapsedWidth,
+        offsetWidth,
+        inheritWidth,
+        style,
+        state,
+        pageScrollLeft,
+      } = this
       const { collapsed, visible, fixed } = state
       let mainStyle
       if (collapsed) {
@@ -154,10 +163,13 @@ export default {
         }
       } else if (fixed || !visible) {
         mainStyle = { ...style }
+        if (fixed && inheritWidth) {
+          mainStyle.width = `${offsetWidth}px`
+        }
       } else if (inheritWidth) {
         mainStyle = {
           ...style,
-          width: fixed ? style.width : '',
+          width: fixed ? `${offsetWidth}px` : '',
         }
       } else {
         mainStyle = {}
@@ -232,8 +244,10 @@ export default {
       handler(val) {
         this.$emit('update:fixed', !!val)
         if (val) {
+          this.registerResizeEvent()
           this.registerWindowEvent()
         } else {
+          this.unregisterResizeEvent()
           this.unregisterWindowEvent()
         }
       },
@@ -274,8 +288,9 @@ export default {
   },
 
   mounted() {
-    this.handlePageScroll()
     const { $basicLayout, state, useTransition } = this
+    this.registerResizeEvent()
+    this.handlePageScroll()
     if ($basicLayout) {
       $basicLayout.$emit(
         'aside-state-change',
@@ -286,8 +301,9 @@ export default {
   },
 
   beforeDestroy() {
-    this.unregisterWindowEvent()
     const { $basicLayout } = this
+    this.unregisterResizeEvent()
+    this.unregisterWindowEvent()
     if ($basicLayout) {
       $basicLayout.$off('aside-state-change', this.updateState)
       $basicLayout.$off('split-resize-start', this.handleResizeStart)
@@ -298,6 +314,18 @@ export default {
   },
 
   methods: {
+    setOffsetWidth() {
+      const { inheritWidth } = this
+      if (!inheritWidth) {
+        return
+      }
+
+      const { container } = this.$refs
+      if (container) {
+        this.offsetWidth = container.offsetWidth
+      }
+    },
+
     syncParentSize(useTransition) {
       const { $parent, rootStyle } = this
       const { width, minWidth, maxWidth } = rootStyle
@@ -377,6 +405,22 @@ export default {
       window.removeEventListener('resize', this.handlePageScroll, false)
       window.removeEventListener('scroll', this.handlePageScroll, false)
     },
+
+    registerResizeEvent() {
+      const { $refs, state } = this
+      const { container } = $refs
+      if (container && state.fixed) {
+        this.setOffsetWidth()
+        addResizeListener(container, this.setOffsetWidth)
+      }
+    },
+
+    unregisterResizeEvent() {
+      const { container } = this.$refs
+      if (container) {
+        removeResizeListener(container, this.setOffsetWidth)
+      }
+    },
   },
 }
 </script>
@@ -388,20 +432,6 @@ export default {
       & > img {
         min-width: 24px;
         max-height: 61.8%;
-      }
-    }
-
-    & > .aside-content {
-      & > .ice-scrollbar {
-        & > .el-scrollbar__bar {
-          &.is-vertical {
-            width: 6px;
-          }
-
-          &.is-horizontal {
-            height: 6px;
-          }
-        }
       }
     }
   }

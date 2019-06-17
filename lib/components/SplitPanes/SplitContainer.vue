@@ -1,10 +1,5 @@
 <template>
-  <div
-    :class="className"
-    @mouseup="onMouseUp"
-    @mousemove="onMouseMove"
-    v-resize.debounce.60="updateSizes"
-  >
+  <div ref="container" :class="className" @mouseup="onMouseUp" @mousemove="onMouseMove">
     <split-pane
       :ref="reversed ? 'two' : 'one'"
       :style="reversed ? null : paneOneStyles"
@@ -43,16 +38,17 @@
 
 <script>
 import debounce from 'lodash.debounce'
-import resize from 'vue-resize-directive'
 import SplitPane from './SplitPane'
 import SplitHandle from './SplitHandle'
 import {
   addAnimationEndListener,
   addAnimationStartListener,
+  addResizeListener,
   addTransitionEndListener,
   addTransitionStartListener,
   removeAnimationEndListener,
   removeAnimationStartListener,
+  removeResizeListener,
   removeTransitionEndListener,
   removeTransitionStartListener,
 } from '../../utils/dom'
@@ -60,7 +56,6 @@ import {
 export default {
   name: 'IceSplitPanes',
   components: { SplitHandle, SplitPane },
-  directives: { resize },
 
   props: {
     /**
@@ -269,21 +264,23 @@ export default {
   mounted() {
     this.updateSizes()
 
-    const { one } = this.$refs
+    const { one, container } = this.$refs
     const elem = one.$el
     addTransitionStartListener(elem, this.onTransitionStart)
     addTransitionEndListener(elem, this.onTransitionEnd)
     addAnimationStartListener(elem, this.onTransitionStart)
     addAnimationEndListener(elem, this.onTransitionEnd)
+    addResizeListener(container, this.updateSizes)
   },
 
   beforeDestroy() {
-    const { one } = this.$refs
+    const { one, container } = this.$refs
     const elem = one.$el
     removeTransitionStartListener(elem, this.onTransitionStart)
     removeTransitionEndListener(elem, this.onTransitionEnd)
     removeAnimationStartListener(elem, this.onTransitionStart)
     removeAnimationEndListener(elem, this.onTransitionEnd)
+    removeResizeListener(container, this.updateSizes)
     clearTimeout(this.$updateSizeTimer)
     clearTimeout(this.$changeSizeTimer)
   },
@@ -392,14 +389,18 @@ export default {
     },
 
     onMouseUp() {
-      this.dragging = false
-      this.onTransitionEnd(() => {
-        this.currentSize = this.getPercentCurrentSize()
-      })
+      if (this.dragging) {
+        this.dragging = false
+        this.onTransitionEnd(() => {
+          this.currentSize = this.getPercentCurrentSize()
+        })
+      }
     },
 
     onMouseMove(event) {
-      this.handler(event)
+      if (this.dragging) {
+        this.handler(event)
+      }
     },
 
     doResize(event) {

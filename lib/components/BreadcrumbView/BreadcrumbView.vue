@@ -1,6 +1,6 @@
 <template>
   <div class="ice-breadcrumb-view">
-    <div class="ice-breadcrumb-view-bar">
+    <div v-show="breadcrumbRoutes.length" class="ice-breadcrumb-view-bar">
       <slot :routes="breadcrumbRoutes" :active="activePath">
         <breadcrumb-bar
           :routes="breadcrumbRoutes"
@@ -155,10 +155,24 @@ export default {
   },
 
   methods: {
+    reload() {
+      const { aliveView } = this.$refs
+      if (aliveView) {
+        aliveView.reload()
+      }
+    },
+
     removeCachedView(path) {
       const { aliveView } = this.$refs
       if (aliveView) {
         aliveView.removeCachedView(path)
+      }
+    },
+
+    clearCachedViews() {
+      const { aliveView } = this.$refs
+      if (aliveView) {
+        aliveView.clearCachedViews()
       }
     },
 
