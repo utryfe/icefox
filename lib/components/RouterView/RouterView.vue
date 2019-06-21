@@ -17,6 +17,7 @@ import { escapeRegExp } from '../../utils/mixed'
 import {
   getDefaultRouteComponent,
   getMatchedRoutesByView,
+  getRouterViewPath,
   isRouteCaseSensitive,
   isSameRoute,
   trimPathTrailingSlash,
@@ -44,8 +45,6 @@ export default {
       type: String,
       default: 'default',
     },
-
-    value: String,
   },
 
   inject: {
@@ -69,6 +68,11 @@ export default {
        * 移除缓存的视图（根据路由记录）
        */
       $removeCachedView: this.removeCachedView.bind(this),
+
+      /**
+       * 重新加载当前组件
+       */
+      $reload: this.reload.bind(this),
     }
   },
 
@@ -152,6 +156,21 @@ export default {
   },
 
   methods: {
+    // 重新加载当前路由组件
+    reload() {
+      const { root, $route, $router } = this
+      const { fullPath } = $route
+
+      const to = getMatchedRoutesByView(this, root)[0]
+      if (to) {
+        this.removeCachedView(to)
+      }
+
+      const viewPath = getRouterViewPath(this, root)
+      // 使用重定向跳板来刷新当前路由视图组件
+      this.$nextTick(() => $router.replace(`${viewPath ? '302' : '301'}${fullPath}`))
+    },
+
     // 移除路由视图
     removeCachedView(route) {
       const { cachedViews } = this
@@ -161,6 +180,12 @@ export default {
           break
         }
       }
+    },
+
+    // 清空缓存的路由组件实例
+    clearCachedViews() {
+      const { cachedViews } = this
+      cachedViews.length = 0
     },
 
     // 更新路由视图

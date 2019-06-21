@@ -74,19 +74,6 @@ export default {
 }
 </script>
 
-<style lang="less">
-.ice-layout-content {
-  &.ice-scrollable > .scroll-wrapper > .ice-scrollbar {
-    & > .el-scrollbar__bar {
-      .el-scrollbar__thumb {
-        background-color: #656667;
-        opacity: 0.75;
-      }
-    }
-  }
-}
-</style>
-
 <style lang="less" scoped>
 .ice-layout-content {
   flex: 1 1 auto;

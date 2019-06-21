@@ -1,6 +1,6 @@
 <template>
   <div class="ice-tabs-view">
-    <div class="ice-tabs-view-bar">
+    <div v-show="viewRoutes.length" class="ice-tabs-view-bar">
       <slot :routes="scopedRoutes" :active="activeName">
         <tabs-bar
           :routes="viewRoutes"
@@ -19,6 +19,7 @@
     <layout-content class="ice-tabs-view-content" :scrollable="scrollable">
       <router-view
         ref="aliveView"
+        :key="refreshViewKey"
         :class="viewClassName"
         :root="root"
         :views="viewRoutes"
@@ -37,7 +38,7 @@
 import RouterView from '../RouterView'
 import LayoutContent from '../Layout/Content'
 import TabsBar from './TabsBar'
-import { escapeRegExp } from '../../utils/mixed'
+import { escapeRegExp, randomSequence } from '../../utils/mixed'
 import { mergeClass, toCamelCaseProps } from '../../utils/vnode'
 import {
   getDefaultRouteComponent,
@@ -102,6 +103,7 @@ export default {
     return {
       viewRoutes: [],
       activePath: '',
+      refreshViewKey: randomSequence(10),
     }
   },
 
@@ -167,6 +169,13 @@ export default {
   },
 
   methods: {
+    reload() {
+      const { aliveView } = this.$refs
+      if (aliveView) {
+        aliveView.reload()
+      }
+    },
+
     // 移除缓存的路由视图
     removeCachedView(path) {
       const { viewRoutes, activeName } = this
@@ -197,7 +206,7 @@ export default {
 
       // 删除完了，返回到根路由
       if (!viewRoutes.length) {
-        this.activePath = this.root || ''
+        this.pushRoute(this.root || '/')
         return
       }
 
@@ -210,7 +219,29 @@ export default {
       }
 
       // 指向下一个临近的路由视图
-      this.activePath = nextView.path
+      this.pushRoute(nextView.path)
+    },
+
+    // 清空缓存的路由组件视图
+    clearCachedViews() {
+      const { viewRoutes, $refs, root } = this
+      const { aliveView } = $refs
+      if (aliveView) {
+        aliveView.clearCachedViews()
+      } else {
+        viewRoutes.length = 0
+      }
+      this.pushRoute(root || '/')
+      this.$nextTick(() => {
+        this.refreshViewKey = randomSequence(10)
+      })
+    },
+
+    pushRoute(route) {
+      const { $router } = this
+      if ($router && route) {
+        $router.push(route)
+      }
     },
 
     getTabNameByRoute(route) {
@@ -237,7 +268,7 @@ export default {
       const { activeName } = this
       const { disabled, name } = tab
       if (!disabled && activeName !== name) {
-        this.activePath = name
+        this.pushRoute(name)
       }
     },
 
