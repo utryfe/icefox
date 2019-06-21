@@ -69,6 +69,7 @@ export default {
         width: '',
         minWidth: '',
         maxWidth: '',
+        marginLeft: '',
       },
     }
   },
@@ -129,9 +130,18 @@ export default {
     },
 
     updateHelperStyle(style) {
-      const { resizing, ...helperStyle } = Object.assign({}, style)
-      this.resizing = !!resizing
-      Object.assign(this.helperStyle, helperStyle)
+      if (this.showHelper) {
+        const { resizing, left, width, ...helperStyle } = Object.assign({}, style)
+        this.resizing = !!resizing
+        let marginLeft = left
+        if (typeof width === 'string' && width.endsWith('px')) {
+          marginLeft = `-${Math.max(
+            Math.min(Math.abs(parseFloat(left)), parseFloat(width)),
+            0
+          )}px`
+        }
+        Object.assign(this.helperStyle, helperStyle, { width, marginLeft })
+      }
     },
   },
 }
