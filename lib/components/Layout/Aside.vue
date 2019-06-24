@@ -255,7 +255,20 @@ export default {
 
     rootStyle: {
       immediate: true,
-      handler: 'syncHeaderSize',
+      handler() {
+        if (!this.state.fixed) {
+          this.syncHeaderSize()
+        }
+      },
+    },
+
+    mainStyle: {
+      immediate: true,
+      handler() {
+        if (this.state.fixed) {
+          this.syncHeaderSize()
+        }
+      },
     },
 
     state: {
@@ -341,21 +354,15 @@ export default {
     },
 
     syncHeaderSize() {
-      const {
-        $basicLayout,
-        resizeWidth,
-        rootStyle,
-        justifyHeight,
-        resizing,
-        state,
-      } = this
-      const { fixed } = state
-      const sizeStyle = { ...rootStyle, resizing }
-      if (resizing) {
-        sizeStyle.width = resizeWidth
-      }
-      this.justify = !!(fixed && justifyHeight)
+      const { $basicLayout } = this
       if ($basicLayout) {
+        const { resizeWidth, rootStyle, mainStyle, justifyHeight, resizing, state } = this
+        const { fixed } = state
+        const sizeStyle = { ...(fixed ? mainStyle : rootStyle), resizing }
+        if (!fixed && resizing) {
+          sizeStyle.width = resizeWidth
+        }
+        this.justify = !!(fixed && justifyHeight)
         $basicLayout.$emit('aside-size-change', sizeStyle)
       }
     },

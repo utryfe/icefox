@@ -38,6 +38,64 @@ interface DebugStatic {
   error(...args: any[]): void
 }
 
+interface EventEmitterPlugin {
+  /**
+   * 发布全局事件
+   * @param eventName
+   * @param args
+   */
+  $emit(eventName: string, ...args: any[]): EventEmitterPlugin
+  emit(eventName: string, ...args: any[]): EventEmitterPlugin
+
+  /**
+   * 订阅全局事件
+   * @param eventName
+   * @param args
+   */
+  $on(eventName: string, ...args: any[]): EventEmitterPlugin
+  on(eventName: string, ...args: any[]): EventEmitterPlugin
+
+  /**
+   * 订阅一次性全局事件
+   * @param eventName
+   * @param args
+   */
+  $once(eventName: string, ...args: any[]): EventEmitterPlugin
+  once(eventName: string, ...args: any[]): EventEmitterPlugin
+
+  /**
+   * 取消全局事件订阅
+   * @param eventName
+   * @param args
+   */
+  $off(eventName: string, ...args: any[]): EventEmitterPlugin
+  off(eventName: string, ...args: any[]): EventEmitterPlugin
+
+  /**
+   * 订阅广播事件并返回订阅解绑函数
+   * @param eventName
+   * @param handler
+   */
+  $subscribe(eventName: string, handler: Function): Function
+  subscribe(eventName: string, handler: Function): Function
+
+  /**
+   * 发布冒泡广播事件（向父组件往上逐级触发，含当前组件）
+   * @param eventName
+   * @param args
+   */
+  $dispatch(eventName: string, ...args: any[]): EventEmitterPlugin
+  dispatch(eventName: string, ...args: any[]): EventEmitterPlugin
+
+  /**
+   * 发布子组件树广播事件（递归子树组件触发，不包含当前组件）
+   * @param eventName
+   * @param args
+   */
+  $broadcast(eventName: string, ...args: any[]): EventEmitterPlugin
+  broadcast(eventName: string, ...args: any[]): EventEmitterPlugin
+}
+
 declare module 'vue-router/types/router' {
   interface VueRouter {
     /**
@@ -94,6 +152,11 @@ declare module 'vue/types/vue' {
     readonly $debug?: DebugStatic
 
     /**
+     * 事件订阅发布管理器
+     */
+    readonly $emitter?: EventEmitterPlugin
+
+    /**
      * 全局设置的应用标题
      */
     readonly $appTitle?: String
@@ -124,6 +187,11 @@ declare module 'vue/types/vue' {
      * 可根据命名空间打印指定日志级别的调试日志输出工具
      */
     readonly $debug?: DebugStatic
+
+    /**
+     * 事件订阅发布管理器
+     */
+    readonly $emitter?: EventEmitterPlugin
   }
 }
 

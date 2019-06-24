@@ -292,12 +292,16 @@ export default {
       const isTitle = slot === 'title'
       const children = getVNodeChildren(elements)
 
-      return $createElement('template', { slot }, [
-        ...(isTitle ? this.createIcon(item, items) : []),
+      return $createElement(
+        'template',
+        { slot },
         isTitle
-          ? $createElement('span', { class: 'ice-menu-item-title' }, children)
-          : children,
-      ])
+          ? [
+              ...this.createIcon(item, items),
+              $createElement('span', { class: 'ice-menu-item-title' }, children),
+            ]
+          : children
+      )
     },
 
     injectMenuClass(vNodes) {

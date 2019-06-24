@@ -252,6 +252,7 @@ export default {
 
   .ice-menu-icon {
     font-size: @aside-menu-icon-font-size;
+    margin-right: @aside-menu-icon-margin-right;
   }
 
   .ice-menu-item-title {
