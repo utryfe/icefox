@@ -5,8 +5,8 @@
       ref="table"
       v-loading="listInfo.loading"
       :data="data"
-      height="525"
       border
+      height="100%"
       @select-all="handleSelectionChange"
       @selection-change="handleSelectionChange"
     >
@@ -68,9 +68,10 @@
     <template v-if="pager">
       <div v-show="!listInfo.loading" class="pagination-container">
         <el-pagination
+          :background="background"
           :current-page.sync="listInfo.query.currentPage"
-          :page-sizes="listInfo.pageSizes"
-          :page-size="listInfo.query.pageSize"
+          :page-sizes="pageSizes"
+          :page-size="pageSize"
           layout="total, sizes, prev, pager, next, jumper"
           :total="listInfo.total"
           @size-change="handleSizeChange"
@@ -136,6 +137,27 @@ export default {
     data: {
       type: Array,
     },
+
+    // 页码选择器
+    pageSizes: {
+      type: Array,
+      default() {
+        return [20, 50, 100, 200]
+      }
+    },
+
+    // 每页数量
+    pageSize: {
+      type: Number,
+      default: 20
+    },
+
+    // 页码是否带背景颜色
+    background: {
+      type: Boolean,
+      default: false
+    }
+
   },
 
   data() {
@@ -144,7 +166,6 @@ export default {
       listInfo: {
         total: 0, // 总条数
         loading: false, // 加载动画
-        pageSizes: [10, 20, 50, 200], // 分页数量列表
         query: {
           // 查询条件
           currentPage: 1, // 当前页
@@ -239,12 +260,13 @@ export default {
 <style lang="less" scoped>
 .page-table {
   width: 100%;
+  height: 94%;
   position: relative;
   padding-bottom: 64px;
   .pagination-container {
     position: absolute;
-    right: 0;
-    bottom: 0;
+    right: 5px;
+    bottom: 10px;
   }
 }
 </style>
