@@ -140,7 +140,7 @@ export default {
 
   data() {
     return {
-      // 列表相关
+      // 分页相关
       listInfo: {
         total: 0, // 总条数
         loading: false, // 加载动画
