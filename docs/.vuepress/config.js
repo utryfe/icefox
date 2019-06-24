@@ -63,6 +63,7 @@ module.exports = {
             'layout',
             'aside-menu',
             'router-tabs',
+            'table-page'
           ],
         },
       ],
