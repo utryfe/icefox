@@ -213,6 +213,8 @@ export default {
               this.$emit('update:data', arr)
               if (this.pager) {
                 this.listInfo.total = result.count
+                this.listInfo.query.currentPage = result.currentPage
+                this.listInfo.query.pageSize = result.pageSize
               }
               resolve(res)
               this.$emit('handleEvent', 'list', arr)
