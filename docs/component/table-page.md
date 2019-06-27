@@ -104,3 +104,4 @@ export default {
 
 ## 源码
 - [在线源码](https://github.com/utryfe/icefox/blob/master/lib/components/TablePage/TablePage.vue)
+- [在线demo](http://www.star2018.com/#/about)
