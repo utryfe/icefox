@@ -123,7 +123,7 @@ body {
 </style>
 
 <style lang="less" scoped>
-@import '../../theme/var.less';
+@import '../../theme/common.less';
 
 .ice-basic-layout {
   min-width: @layout-min-width;

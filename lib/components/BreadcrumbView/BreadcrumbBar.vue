@@ -60,7 +60,7 @@ export default {
 </script>
 
 <style lang="less">
-@import '../../theme/var.less';
+@import '../../theme/common.less';
 
 .ice-router-breadcrumb {
   line-height: 1.5;
@@ -87,7 +87,7 @@ export default {
 </style>
 
 <style lang="less" scoped>
-@import '../../theme/var.less';
+@import '../../theme/common.less';
 
 .breadcrumb-transition {
   &-enter-active,

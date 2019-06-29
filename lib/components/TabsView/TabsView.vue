@@ -16,7 +16,7 @@
       </slot>
     </div>
 
-    <layout-content class="ice-tabs-view-content" :scrollable="scrollable">
+    <layout-content :class="tabContentClassName" :scrollable="scrollable">
       <router-view
         ref="aliveView"
         :key="refreshViewKey"
@@ -119,6 +119,16 @@ export default {
           ? keepAliveProps($route, activeComponent)
           : keepAliveProps
       )
+    },
+
+    tabContentClassName() {
+      const { viewRoutes } = this
+      return [
+        'ice-tabs-view-content',
+        {
+          'ice-border-top': !viewRoutes.length,
+        },
+      ]
     },
 
     viewClassName() {
@@ -284,7 +294,7 @@ export default {
 </script>
 
 <style lang="less">
-@import '../../theme/var.less';
+@import '../../theme/common.less';
 .ice-tabs-view-content-wrapper {
   box-sizing: border-box;
   padding: @layout-tabs-view-content-padding;
@@ -292,7 +302,7 @@ export default {
 </style>
 
 <style lang="less" scoped>
-@import '../../theme/var.less';
+@import '../../theme/common.less';
 
 .ice-tabs-view {
   height: 100%;
@@ -308,6 +318,10 @@ export default {
     flex: 1 1 auto;
     box-sizing: border-box;
     background-color: @layout-tabs-view-content-background-color;
+  }
+
+  .ice-border-top {
+    border-top: 1px solid @layout-tabs-bar-border-color;
   }
 }
 </style>

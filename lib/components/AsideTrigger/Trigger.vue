@@ -110,7 +110,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@import '../../theme/var.less';
+@import '../../theme/common.less';
 
 .aside-trigger {
   display: inline-block;

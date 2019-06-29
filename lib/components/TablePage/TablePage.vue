@@ -143,21 +143,20 @@ export default {
       type: Array,
       default() {
         return [20, 50, 100, 200]
-      }
+      },
     },
 
     // 每页数量
     pageSize: {
       type: Number,
-      default: 20
+      default: 20,
     },
 
     // 页码是否带背景颜色
     background: {
       type: Boolean,
-      default: false
-    }
-
+      default: false,
+    },
   },
 
   data() {
@@ -262,7 +261,8 @@ export default {
 <style lang="less" scoped>
 .page-table {
   width: 100%;
-  height: 94%;
+  height: 100%;
+  box-sizing: border-box;
   position: relative;
   padding-bottom: 64px;
   .pagination-container {

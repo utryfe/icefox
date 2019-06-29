@@ -1,6 +1,6 @@
 {
   "name": "icefox",
-  "version": "1.1.6",
+  "version": "1.2.0",
   "description": "A library for vue app.",
   "main": "lib/index.js",
   "scripts": {
@@ -20,8 +20,8 @@
   "peerDependencies": {
     "element-ui": "^2.5.0",
     "vue": "^2.5.0",
-    "vue-router": "^3.0.6",
-    "vuex": "^3.1.0"
+    "vue-router": "^3.0.0",
+    "vuex": "^3.0.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-eslint": "^3.7.0",
@@ -34,9 +34,9 @@
     "less-loader": "^5.0.0",
     "lint-staged": "^8.1.5",
     "vue": "^2.5.0",
-    "vue-router": "^3.0.6",
+    "vue-router": "^3.0.0",
     "vuepress": "^1.0.2",
-    "vuex": "^3.1.0",
+    "vuex": "^3.0.0",
     "window": "^4.2.6"
   },
   "gitHooks": {
@@ -63,7 +63,7 @@
   },
   "homepage": "https://utryfe.github.io/icefox-docs/",
   "engines": {
-    "node": ">=8.3.0"
+    "node": ">=8.6.0"
   },
   "types": "types/index.d.ts",
   "license": "MIT"

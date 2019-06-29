@@ -61,8 +61,8 @@ module.exports = {
           children: [
             //
             'layout',
+            'tabs-view',
             'aside-menu',
-            'router-tabs',
             'table-page',
             'date-picker',
           ],

@@ -80,10 +80,7 @@ export default {
   padding: 0.1px 0 0 0;
   margin: -0.1px 0 0 0;
   box-sizing: border-box;
-
-  &.ice-scrollable {
-    position: relative;
-  }
+  position: relative;
 }
 
 .scroll-wrapper {

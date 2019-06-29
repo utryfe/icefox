@@ -111,4 +111,4 @@ DatePicker组件对elementUI的datePicker进行再封装，扩展，增加了季
 
 ## 源码
 - [在线源码](https://github.com/utryfe/icefox/blob/master/lib/components/TablePage/TablePage.vue)
-- [在线demo](http://www.star2018.com/#/datepicker)
+- [在线demo](http://www.star2018.com/datepicker)

@@ -446,7 +446,7 @@ export default {
 </style>
 
 <style lang="less" scoped>
-@import '../../theme/var.less';
+@import '../../theme/common.less';
 
 .ice-layout-aside {
   flex: none;
