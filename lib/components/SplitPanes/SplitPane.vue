@@ -103,13 +103,13 @@ export default {
     flex: none;
 
     &.ice-flex-reversed {
-      flex: 1 1 auto;
+      flex: 1 1 0;
     }
   }
 
   &-right,
   &-bottom {
-    flex: 1 1 auto;
+    flex: 1 1 0;
 
     &.ice-flex-reversed {
       flex: none;

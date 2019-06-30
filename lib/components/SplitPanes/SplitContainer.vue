@@ -87,7 +87,7 @@ export default {
      */
     minSize: {
       type: [String, Number],
-      default: '',
+      default: '20%',
     },
 
     /**
@@ -137,7 +137,7 @@ export default {
     const { minSize, maxSize, initialSize } = this
     return {
       limitSize: {
-        min: minSize === '' ? initialSize : minSize,
+        min: minSize,
         max: maxSize,
       },
       asLayout: false,

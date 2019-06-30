@@ -189,7 +189,7 @@ export default {
 }
 
 .header-content {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   height: 100%;
   box-sizing: border-box;
   display: flex;

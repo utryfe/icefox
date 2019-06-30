@@ -115,7 +115,7 @@ export default {
   &-vertical {
     width: 0;
     max-width: 0;
-    flex: 1 1 auto;
+    flex: 1 1 0;
 
     &:before {
       left: -6px;

@@ -315,7 +315,7 @@ export default {
   }
 
   &-content {
-    flex: 1 1 auto;
+    flex: 1 1 0;
     box-sizing: border-box;
     background-color: @layout-tabs-view-content-background-color;
   }

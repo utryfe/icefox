@@ -73,7 +73,7 @@ export default {
   & > .ice-splitter-container-item {
     width: auto;
     height: auto;
-    flex: 1 1 auto;
+    flex: 1 1 0;
   }
 
   &.ice-layout-split {
@@ -92,7 +92,7 @@ export default {
 
 .ice-layout {
   display: flex;
-  flex: 1 1 auto;
+  flex: 1 1 0;
   flex-direction: column;
   border: none;
   padding: 0.1px 0 0 0;

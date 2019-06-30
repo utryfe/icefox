@@ -124,7 +124,7 @@ export default {
     }
 
     & > .ice-scroll-view {
-      flex: 1 1 auto;
+      flex: 1 1 0;
       overflow: visible;
       padding: 0.1px 0 0 0;
       margin: -0.1px 0 0 0;

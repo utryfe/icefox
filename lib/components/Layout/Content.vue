@@ -76,7 +76,7 @@ export default {
 
 <style lang="less" scoped>
 .ice-layout-content {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   padding: 0.1px 0 0 0;
   margin: -0.1px 0 0 0;
   box-sizing: border-box;
