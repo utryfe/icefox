@@ -135,6 +135,11 @@ export declare class IceLayoutAside extends IceComponent {
   collapsible: boolean
 
   /**
+   * 是否可滚动
+   */
+  scrollable: boolean
+
+  /**
    * 是否已经折叠（.sync）
    */
   collapsed: boolean

@@ -6,7 +6,7 @@
       </div>
 
       <div class="aside-content">
-        <element-scrollbar v-if="state.fixed">
+        <element-scrollbar v-if="state.fixed || scrollable">
           <slot />
         </element-scrollbar>
 
@@ -50,6 +50,11 @@ export default {
      * 是否可折叠（启用时会显示trigger）
      */
     collapsible: Boolean,
+
+    /**
+     * 是否可滚动
+     */
+    scrollable: Boolean,
 
     /**
      * 是否已经折叠（.sync）
