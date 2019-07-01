@@ -63,7 +63,7 @@ module.exports = {
             'layout',
             'tabs-view',
             'aside-menu',
-            'table-page',
+            'page-table',
             'date-picker',
           ],
         },

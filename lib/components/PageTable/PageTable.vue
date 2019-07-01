@@ -84,7 +84,7 @@
 
 <script>
 export default {
-  name: 'IceTablePage',
+  name: 'IcePageTable',
 
   props: {
     // 自定义类名

@@ -6,7 +6,7 @@ TablePage 组件主要是基于 Element 的 el-table 和 el-pagination 进行了
 
 ```vue
 <template>
-  <ice-table-page
+  <ice-page-table
     background
     :data.sync="tableInfo.data"
     :refresh="tableInfo.refresh"

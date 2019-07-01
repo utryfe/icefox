@@ -1,5 +1,5 @@
 <template>
-  <ice-table-page
+  <ice-page-table
     background
     :handle="tableInfo.handle"
     :data.sync="tableInfo.data"
@@ -10,7 +10,7 @@
 
 <script>
 export default {
-  name: 'test-abc',
+  name: 'pageTable',
   data() {
     return {
       tableInfo: {
