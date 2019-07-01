@@ -64,6 +64,7 @@ module.exports = {
             'tabs-view',
             'aside-menu',
             'page-table',
+            'page-filter',
             'date-picker',
           ],
         },
