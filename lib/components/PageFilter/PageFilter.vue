@@ -1,13 +1,9 @@
 <template>
   <div class="page-filter" :class="className">
-    <div
-      v-for="(item, index) in getConfigList()"
-      :key="index"
-      class="filter-item"
-    >
+    <div v-for="(item, index) in getConfigList()" :key="index" class="filter-item">
       <!-- <label class="filter-label" v-if="item.type !== 'button'">{{item.key}}</label> -->
       <!-- 输入框 -->
-      <el-input
+      <element-input
         v-if="item.type === 'input'"
         v-model="searchQuery[item.value]"
         :class="`filter-${item.type}`"
@@ -18,7 +14,7 @@
         @focus="handleEvent(item.event)"
       />
       <!-- 选择框 -->
-      <el-select
+      <element-select
         v-if="item.type === 'select'"
         v-model="searchQuery[item.value]"
         :class="`filter-${item.type}`"
@@ -28,25 +24,15 @@
         :placeholder="getPlaceholder(item)"
         @change="handleEvent(item.even)"
       >
-        <el-option
+        <element-option
           v-for="(childItem, childIndex) in listTypeInfo[item.list]"
           :key="childIndex"
           :label="childItem.key"
           :value="childItem.value"
         />
-      </el-select>
-      <!-- 时间选择框 -->
-      <el-time-select
-        v-if="item.type === 'time'"
-        v-model="searchQuery[item.value]"
-        :class="`filter-${item.type}`"
-        :picker-options="item.TimePickerOptions"
-        :clearable="item.clearable === false ? item.clearable : true"
-        :disabled="item.disabled"
-        :placeholder="getPlaceholder(item)"
-      />
+      </element-select>
       <!-- 日期选择框 -->
-      <el-date-picker
+      <element-time-picker
         v-if="item.type === 'date'"
         v-model="searchQuery[item.value]"
         :class="`filter-${item.type}`"
@@ -58,60 +44,72 @@
         @focus="handleEvent(item.event)"
       />
       <!-- 按钮 -->
-      <el-button
+      <element-button
         v-else-if="item.type === 'button'"
-        v-waves
         :class="`filter-${item.type}`"
         :type="item.btType"
         :icon="item.icon"
         @click="handleClick(item.event)"
       >
         {{ item.label }}
-      </el-button>
+      </element-button>
     </div>
   </div>
 </template>
 
 <script>
+import { Input, Select, Option, Button, TimePicker } from 'element-ui'
 export default {
   name: 'IcePageFilter',
+  components: {
+    ElementInput: Input,
+    ElementSelect: Select,
+    ElementOption: Option,
+    ElementButton: Button,
+    ElementTimePicker: TimePicker,
+  },
   props: {
     // 自定义类名
     className: {
-      type: String
+      type: String,
     },
+
     // 相关列表
     listTypeInfo: {
       type: Object,
       default: () => {
         return {}
-      }
+      },
     },
+
     // 过滤器列表
     filterList: {
-      type: Array
+      type: Array,
     },
+
     // 参数
     query: {
-      type: Object
-    }
+      type: Object,
+    },
   },
-  data () {
+
+  data() {
     return {
       // 时间相关设置
       datePickerOptions: {
-        disabledDate (time) {
+        disabledDate(time) {
           // 大于当前的时间都不能选 (+十分钟让点击此刻的时候可以选择到当前时间)
           return time.getTime() > +new Date() + 1000 * 600 * 1
-        }
+        },
       },
       flag: 'inner', // 内 inner  外outside
-      searchQuery: {}
+      searchQuery: {},
     }
   },
+
   watch: {
     searchQuery: {
-      handler: function (val) {
+      handler: function(val) {
         // 传入参数修改，不派发
         if (this.flag === 'outside') {
           this.flag = 'inner'
@@ -120,18 +118,21 @@ export default {
         // 修改传入进来的参数
         this.$emit('update:query', { ...this.query, ...val })
       },
-      deep: true // 深度监听
+      deep: true, // 深度监听
     },
-    query (val) {
+
+    query(val) {
       this.flag = 'outside' // 标识为传入参数修改
       this.searchQuery = val
-    }
+    },
   },
-  mounted () {
+
+  mounted() {
     this.initParams()
   },
+
   methods: {
-    initParams () {
+    initParams() {
       const obj = {}
       for (const key in this.query) {
         if (this.query[key]) {
@@ -141,11 +142,15 @@ export default {
       this.searchQuery = obj
     },
     // 获取列表
-    getConfigList () {
-      return this.filterList.filter(item => !item.hasOwnProperty('show') || (item.hasOwnProperty('show') && item.show))
+    getConfigList() {
+      return this.filterList.filter(
+        (item) =>
+          !item.hasOwnProperty('show') || (item.hasOwnProperty('show') && item.show)
+      )
     },
+
     // 得到placeholder的显示
-    getPlaceholder (row) {
+    getPlaceholder(row) {
       let placeholder
       if (row.type === 'input' || row.type === 'textarea') {
         placeholder = '请输入' + row.label
@@ -156,17 +161,41 @@ export default {
       }
       return placeholder
     },
+
     // 绑定的相关事件
-    handleEvent (evnet) {
+    handleEvent(evnet) {
       this.$emit('handleEvent', evnet)
     },
+
     // 派发按钮点击事件
-    handleClick (event, data) {
+    handleClick(event, data) {
       this.$emit('handleClick', event, data)
-    }
-  }
+    },
+  },
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
+.page-filter {
+  padding-bottom: 5px;
+  .filter-item {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 7px;
+    margin-right: 10px;
+  }
+  .filter-label {
+    padding-right: 5px;
+    font-size: 14px;
+    color: #606266;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .filter-input,
+  .filter-time,
+  .filter-date,
+  .filter-select {
+    width: 180px;
+  }
+}
 </style>

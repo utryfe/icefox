@@ -1,7 +1,7 @@
 <template>
   <div class="page-table" :class="className">
     <!-- 显示表格 -->
-    <el-table
+    <element-table
       ref="table"
       v-loading="listInfo.loading"
       :max-height="listInfo.tableHeight || undefined"
@@ -10,8 +10,13 @@
       @select-all="handleSelectionChange"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column v-if="checkBox" :key="'selection'" type="selection" width="55" />
-      <el-table-column
+      <element-table-column
+        v-if="checkBox"
+        :key="'selection'"
+        type="selection"
+        width="55"
+      />
+      <element-table-column
         v-if="tabIndex"
         :key="'index'"
         align="center"
@@ -24,8 +29,8 @@
             scope.$index + 1 + (listInfo.query.currentPage - 1) * listInfo.query.pageSize
           }}</span>
         </template>
-      </el-table-column>
-      <el-table-column
+      </element-table-column>
+      <element-table-column
         v-for="(item, index) in fieldList.filter((item) => !item.hidden)"
         :key="index"
         :prop="item.prop"
@@ -35,8 +40,8 @@
         :width="item.width"
         :min-width="item.minWidth || '100px'"
       >
-      </el-table-column>
-      <el-table-column
+      </element-table-column>
+      <element-table-column
         v-if="handle"
         :key="'handle'"
         :fixed="handle.fixed"
@@ -61,13 +66,13 @@
             </el-button>
           </template>
         </template>
-      </el-table-column>
-    </el-table>
+      </element-table-column>
+    </element-table>
 
     <!-- 分页组件 -->
     <template v-if="pager">
       <div v-show="!listInfo.loading" class="pagination-container">
-        <el-pagination
+        <element-pagination
           :background="background"
           :current-page.sync="listInfo.query.currentPage"
           :page-sizes="pageSizes"
@@ -83,9 +88,15 @@
 </template>
 
 <script>
+import { Table, TableColumn, Pagination } from 'element-ui'
 export default {
   name: 'IcePageTable',
 
+  components: {
+    ElementTable: Table,
+    ElementTableColumn: TableColumn,
+    ElementPagination: Pagination,
+  },
   props: {
     // 自定义类名
     className: {
@@ -171,6 +182,14 @@ export default {
       default: false,
     },
 
+    // 选中列表
+    checkedList: {
+      type: Array,
+      default: () => {
+        return []
+      },
+    },
+
     // 监听高度
     listenHeight: {
       type: Boolean,
@@ -247,6 +266,16 @@ export default {
                 this.listInfo.query.currentPage = result.currentPage
                 this.listInfo.query.pageSize = result.pageSize
               }
+              // 设置当前选中项
+              this.checkedList.forEach((selected) => {
+                const row = arr.find((item) => {
+                  return item.flag === selected
+                })
+                this.$nextTick(() => {
+                  if (!row) return
+                  this.$refs.table.toggleRowSelection(row, true)
+                })
+              })
               resolve(res)
               this.$emit('handleEvent', 'list', arr)
             } else {
