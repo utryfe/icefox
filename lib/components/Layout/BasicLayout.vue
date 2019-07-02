@@ -132,8 +132,12 @@ body {
   box-sizing: border-box;
   overflow: hidden;
   display: flex;
-  flex: 1 1 0;
+  flex: 1 1 auto;
   flex-direction: column;
+
+  .ice-layout-body {
+    flex: 1 1 auto;
+  }
 }
 
 .ice-layout-body {
