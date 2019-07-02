@@ -177,6 +177,7 @@ export default {
 
 <style lang="less" scoped>
 .page-filter {
+  flex: 0 0 47px;
   padding-bottom: 5px;
   .filter-item {
     display: inline-flex;

@@ -3,8 +3,9 @@
     <!-- 显示表格 -->
     <element-table
       ref="table"
+      class="my-table"
+      height="数值无关紧要，但必须要设置"
       v-loading="listInfo.loading"
-      :max-height="listInfo.tableHeight || undefined"
       :data="data"
       border
       @select-all="handleSelectionChange"
@@ -201,7 +202,6 @@ export default {
     return {
       // 分页相关
       listInfo: {
-        tableHeight: 0,
         total: 0, // 总条数
         loading: false, // 加载动画
         query: {
@@ -221,18 +221,6 @@ export default {
       if (!this.api) return
       this.getList(this.api)
     },
-  },
-
-  mounted() {
-    if (this.listenHeight) {
-      // 得到表格的高度
-      this.listInfo.tableHeight = this.getTableHeight()
-      // 监听页面大小改变
-      window.addEventListener('resize', () => {
-        // 得到表格的高度
-        this.listInfo.tableHeight = this.getTableHeight()
-      })
-    }
   },
 
   methods: {
@@ -315,38 +303,18 @@ export default {
     handleClick(event, data) {
       this.$emit('handleClick', event, data)
     },
-
-    // 根据页面的头部, 功能框, 分页组件等高度，计算出table的高度
-    getTableHeight() {
-      // 当表格存在的时候才执行操作
-      if (document.getElementsByClassName('el-table').length === 0) {
-        return
-      }
-      const boxH = document.body.clientHeight
-      const searchH = document.getElementsByClassName('page-filter')[0]
-        ? document.getElementsByClassName('page-filter')[0].clientHeight
-        : 0
-      const pagerH = document.getElementsByClassName('pagination-container')[0] || {
-        clientHeight: 0,
-      }
-      const bottomH = pagerH.clientHeight
-        ? pagerH.clientHeight + 40
-        : pagerH.clientHeight - 35
-      const tab = document.getElementsByClassName('el-table')[0] || { offsetTop: 0 }
-      const tabOffT = tab.offsetTop
-
-      // 表格的高度 = 视口高度 - 表格到头部导航的距离 - 头部导航的高度137 - 分页组件的高度100 - 分页组件
-      document.getElementsByClassName('el-table')[0].style.height =
-        boxH - tabOffT - searchH - bottomH + 'px'
-      // console.log('表格最大高度为:' + (boxH - tabOffT - searchH - bottomH))
-      return boxH - tabOffT - searchH - bottomH
-    },
   },
 }
 </script>
 
 <style lang="less" scoped>
 .page-table {
+  flex: 1;
+  .my-table {
+    height: 89%;
+    position: relative;
+    width: 100%;
+  }
   .pagination-container {
     padding: 15px 0;
   }
