@@ -1,6 +1,6 @@
-# TablePage 分页表格
+# PageTable 分页表格
 
-TablePage 组件主要是基于 Element 的 el-table 和 el-pagination 进行了二次封装。
+PageTable 组件主要是基于 Element 的 el-table 和 el-pagination 进行了二次封装。
 
 ## 使用方式
 
@@ -77,7 +77,7 @@ export default {
 </script>
 ```
 
-<test-abc/>
+<page-table/>
 
 ## Attributes
 
