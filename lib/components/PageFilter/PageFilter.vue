@@ -32,12 +32,15 @@
         />
       </element-select>
       <!-- 日期选择框 -->
-      <element-time-picker
+      <element-date-time-picker
         v-if="item.type === 'date'"
         v-model="searchQuery[item.value]"
         :class="`filter-${item.type}`"
         :picker-options="item.datePickerOptions || datePickerOptions"
-        :type="item.dateType"
+        type="datetimerange"
+        range-separator="至"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
         :clearable="item.clearable === false ? item.clearable : true"
         :disabled="item.disabled"
         :placeholder="getPlaceholder(item)"
@@ -58,7 +61,7 @@
 </template>
 
 <script>
-import { Input, Select, Option, Button, TimePicker } from 'element-ui'
+import { Input, Select, Option, Button, DatePicker } from 'element-ui'
 export default {
   name: 'IcePageFilter',
   components: {
@@ -66,7 +69,7 @@ export default {
     ElementSelect: Select,
     ElementOption: Option,
     ElementButton: Button,
-    ElementTimePicker: TimePicker,
+    ElementDateTimePicker : DatePicker ,
   },
   props: {
     // 自定义类名
@@ -194,9 +197,12 @@ export default {
   }
   .filter-input,
   .filter-time,
-  .filter-date,
   .filter-select {
     width: 180px;
   }
+  .filter-date {
+    width: 390px;
+  }
+
 }
 </style>
