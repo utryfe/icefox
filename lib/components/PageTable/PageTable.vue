@@ -4,7 +4,7 @@
     <element-table
       ref="table"
       class="my-table"
-      height="92%"
+      height="89%"
       v-loading="listInfo.loading"
       :data="data"
       border
