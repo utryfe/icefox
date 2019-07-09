@@ -4,7 +4,7 @@
     <element-table
       ref="table"
       class="my-table"
-      height="数值无关紧要，但必须要设置"
+      height="92%"
       v-loading="listInfo.loading"
       :data="data"
       border
@@ -72,7 +72,7 @@
 
     <!-- 分页组件 -->
     <template v-if="pager">
-      <div v-show="!listInfo.loading" class="pagination-container">
+      <div class="pagination-container">
         <element-pagination
           :background="background"
           :current-page.sync="listInfo.query.currentPage"
@@ -309,14 +309,14 @@ export default {
 
 <style lang="less" scoped>
 .page-table {
-  flex: 1;
+  flex-grow: 1;
+  position: relative;
   .my-table {
-    height: 89%;
-    position: relative;
-    width: 100%;
+    position: absolute;
   }
   .pagination-container {
-    padding: 15px 0;
+    position: absolute;
+    bottom: 10px;
   }
 }
 </style>
