@@ -69,7 +69,7 @@ export default {
     ElementSelect: Select,
     ElementOption: Option,
     ElementButton: Button,
-    ElementDateTimePicker : DatePicker ,
+    ElementDateTimePicker: DatePicker,
   },
   props: {
     // 自定义类名
