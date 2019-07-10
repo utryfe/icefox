@@ -74,7 +74,7 @@ export default {
   },
 
   watch: {
-    modelValue() {
+    bindValue() {
       this.$nextTick(() => {
         this.updateInnerState()
       })
