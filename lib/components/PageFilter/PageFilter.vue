@@ -64,6 +64,7 @@
 import { Input, Select, Option, Button, DatePicker } from 'element-ui'
 export default {
   name: 'IcePageFilter',
+  inheritAttrs: false,
   components: {
     ElementInput: Input,
     ElementSelect: Select,

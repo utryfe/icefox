@@ -92,7 +92,7 @@
 import { Table, TableColumn, Pagination } from 'element-ui'
 export default {
   name: 'IcePageTable',
-
+  inheritAttrs: false,
   components: {
     ElementTable: Table,
     ElementTableColumn: TableColumn,
