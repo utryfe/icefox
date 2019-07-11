@@ -66,6 +66,7 @@ module.exports = {
             'page-table',
             'page-filter',
             'date-picker',
+            'chart',
           ],
         },
       ],
