@@ -30,10 +30,10 @@
       >
         关闭
       </li>
-      <li v-if="activeName" @click="_closeOthersTags">
+      <li v-if="activeName && viewRoutes.length > 2" @click="_closeOthersTags">
         关闭其他
       </li>
-      <li @click="clearCachedViews">
+      <li v-if="viewRoutes.length > 2" @click="clearCachedViews">
         关闭所有
       </li>
     </ul>
