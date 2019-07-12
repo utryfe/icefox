@@ -12,10 +12,31 @@
           v-on="$listeners"
           @tab-click="handleRouterLink"
           @tab-remove="removeCachedView"
+          @contextmenu.prevent.native.stop="_openMenu($event)"
         />
       </slot>
     </div>
-
+    <ul
+      v-show="visible"
+      class="contextmenu"
+      :style="{ left: left + 'px', top: top + 'px' }"
+    >
+      <li v-if="activeName" @click="reload()">
+        刷新
+      </li>
+      <li
+        v-if="activeName && viewRoutes.length > 1"
+        @click="removeCachedView(activeName)"
+      >
+        关闭
+      </li>
+      <li v-if="activeName" @click="_closeOthersTags">
+        关闭其他
+      </li>
+      <li @click="clearCachedViews">
+        关闭所有
+      </li>
+    </ul>
     <layout-content :class="tabContentClassName" :scrollable="scrollable">
       <router-view
         ref="aliveView"
@@ -104,6 +125,9 @@ export default {
       viewRoutes: [],
       activePath: '',
       refreshViewKey: randomSequence(10),
+      visible: false,
+      top: 0,
+      left: 0,
     }
   },
 
@@ -176,6 +200,14 @@ export default {
     currentRouterState() {
       this.$emit('change', { ...this.currentRouterState })
     },
+
+    visible(value) {
+      if (value) {
+        document.body.addEventListener('click', this._closeMenu)
+      } else {
+        document.body.removeEventListener('click', this._closeMenu)
+      }
+    },
   },
 
   methods: {
@@ -184,6 +216,30 @@ export default {
       if (aliveView) {
         aliveView.reload()
       }
+    },
+
+    _closeOthersTags() {
+      const { viewRoutes, $refs } = this
+      const { aliveView } = $refs
+      if (aliveView) {
+        aliveView.clearCachedViews()
+      } else {
+        viewRoutes.length = 0
+      }
+      this.pushRoute(this.activeName)
+      this.$nextTick(() => {
+        this.refreshViewKey = randomSequence(10)
+      })
+    },
+
+    _openMenu(e) {
+      this.visible = true
+      this.left = e.clientX - 220
+      this.top = e.clientY - 50
+    },
+
+    _closeMenu() {
+      this.visible = false
     },
 
     // 移除缓存的路由视图
@@ -322,6 +378,28 @@ export default {
 
   .ice-border-top {
     border-top: 1px solid @layout-tabs-bar-border-color;
+  }
+
+  .contextmenu {
+    margin: 0;
+    background: #fff;
+    z-index: 100;
+    position: absolute;
+    list-style-type: none;
+    padding: 5px 0;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 400;
+    color: #333;
+    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.3);
+    li {
+      margin: 0;
+      padding: 7px 16px;
+      cursor: pointer;
+      &:hover {
+        background: #eee;
+      }
+    }
   }
 }
 </style>
