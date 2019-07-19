@@ -21,13 +21,10 @@
       class="contextmenu"
       :style="{ left: left + 'px', top: top + 'px' }"
     >
-      <li v-if="activeName" @click="reload()">
+      <li @click="reload()">
         刷新
       </li>
-      <li
-        v-if="activeName && viewRoutes.length > 1"
-        @click="removeCachedView(activeName)"
-      >
+      <li @click="removeCachedView(activeName)">
         关闭
       </li>
       <li v-if="activeName && viewRoutes.length > 2" @click="_closeOthersTags">
