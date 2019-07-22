@@ -4,7 +4,7 @@
     <element-table
       ref="table"
       class="my-table"
-      height="89%"
+      height="xxx"
       v-loading="listInfo.loading"
       :data="data"
       border
@@ -37,6 +37,8 @@
         :prop="item.prop"
         :label="item.label"
         :fixed="item.fixed"
+        :formatter="item.formatter"
+        :sortable="item.sortable"
         align="center"
         :width="item.width"
         :min-width="item.minWidth || '100px'"
@@ -309,14 +311,13 @@ export default {
 
 <style lang="less" scoped>
 .page-table {
-  flex-grow: 1;
-  position: relative;
+  height: 94%;
   .my-table {
-    position: absolute;
+    height: 87%;
+    margin-bottom: 50px;
   }
   .pagination-container {
-    position: absolute;
-    bottom: 10px;
+    float: right;
   }
 }
 </style>

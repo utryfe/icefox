@@ -8,6 +8,7 @@
         v-model="searchQuery[item.value]"
         :class="`filter-${item.type}`"
         :type="item.type"
+        :size="item.size"
         :disabled="item.disabled"
         :clearable="item.clearable === false ? item.clearable : true"
         :placeholder="getPlaceholder(item)"
@@ -22,6 +23,7 @@
         :clearable="item.clearable === false ? item.clearable : true"
         :filterable="item.filterable === false ? item.filterable : true"
         :placeholder="getPlaceholder(item)"
+        :size="item.size"
         @change="handleEvent(item.even)"
       >
         <element-option
@@ -45,6 +47,7 @@
         :disabled="item.disabled"
         :placeholder="getPlaceholder(item)"
         @focus="handleEvent(item.event)"
+        :size="item.size"
       />
       <!-- 按钮 -->
       <element-button
@@ -52,6 +55,7 @@
         :class="`filter-${item.type}`"
         :type="item.btType"
         :icon="item.icon"
+        :size="item.size"
         @click="handleClick(item.event)"
       >
         {{ item.label }}
