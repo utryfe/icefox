@@ -14,7 +14,7 @@ _2019-06-29_
 
 #### 新特性
 
-- 新增组件 `IceTablePage`。
+- 新增组件 `IcePageTable`。
 - 新增组件 `IceDatePicker`。
 
 #### 优化
